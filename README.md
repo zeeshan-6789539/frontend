@@ -1,18 +1,41 @@
 # RMS Frontend
 
-Restaurant Management System frontend built on Next.js 16 (App Router + Turbopack).
+**Rent Management System UI**: the admin web app for the multi-company rent platform. Super admins use it to onboard companies and users. Company admins use it to run properties, tenants, leases, ledgers and payments, and to print invoices and statements.
+
+Next.js 16 (App Router + Turbopack). The API is in the sibling repo [`rms-backend`](../rms-backend/README.md), which also documents the full database schema and business rules.
+
+---
+
+## Contents
+
+1. [Stack](#stack)
+2. [Getting started](#getting-started)
+3. [Screens by role](#screens-by-role)
+4. [Project structure](#project-structure)
+5. [User flows](#user-flows)
+6. [Data fetching](#data-fetching)
+7. [Auth and session](#auth-and-session)
+8. [Language switching](#language-switching)
+9. [Theming](#theming)
+10. [Conventions](#conventions)
+
+---
 
 ## Stack
 
-| Concern    | Choice                                     |
-| ---------- | ------------------------------------------ |
-| Framework  | Next.js 16.3 / React 19.3                  |
-| Styling    | Tailwind CSS 4 (CSS-first `@theme` tokens) |
-| i18n       | next-intl 4 — English / Urdu with RTL      |
-| Theming    | next-themes — light / dark / system        |
-| Data       | TanStack Query 5 + Axios                   |
-| Validation | Zod 4                                      |
-| Icons      | lucide-react                               |
+| Concern | Choice |
+| --- | --- |
+| Framework | Next.js 16.3 / React 19.3 |
+| Styling | Tailwind CSS 4 (CSS-first `@theme` tokens) |
+| i18n | next-intl 4: English / Urdu with RTL |
+| Theming | next-themes: light / dark / system |
+| Data | TanStack Query 5 + Axios |
+| Validation | Zod 4 |
+| Charts | Recharts 3 |
+| PDF | jsPDF + jspdf-autotable (built in the browser) |
+| Icons | lucide-react |
+
+---
 
 ## Getting started
 
@@ -22,126 +45,197 @@ cp .env.example .env.local
 pnpm dev
 ```
 
-The frontend runs on **:5001** and expects the RMS backend on **:5000**:
+The frontend runs on **:5001** and expects the backend on **:5000**:
 
 ```
 NEXT_PUBLIC_API_BASE_URL=http://localhost:5000/api/v1
 ```
 
-That URL is the backend host plus its global prefix (`API_PREFIX=api`) and URI version
-(`API_VERSION=1`). The backend must allow `http://localhost:5001` in its `CORS_ORIGINS`.
+That URL is the backend host plus its global prefix (`API_PREFIX=api`) and URI version (`API_VERSION=1`). The backend must list `http://localhost:5001` in `CORS_ORIGINS`.
 
-Scripts: `dev`, `build`, `start`, `lint`, `typecheck`.
+| Script | What it does |
+| --- | --- |
+| `pnpm dev` | Dev server on :5001 |
+| `pnpm build` / `pnpm start` | Production build / serve on :5001 |
+| `pnpm lint` | ESLint |
+| `pnpm typecheck` | `tsc --noEmit` |
 
-## Folder structure
+To sign in the first time, use the super admin that the backend's `pnpm db:seed` creates (`SEED_SUPER_ADMIN_EMAIL` / `SEED_SUPER_ADMIN_PASSWORD`).
+
+---
+
+## Screens by role
+
+Every route has a locale prefix (`/en/...`, `/ur/...`).
+
+| Route | Screen | Role | In sidebar |
+| --- | --- | --- | --- |
+| `/login` | Email + password sign-in | Anonymous | — |
+| `/` | Dashboard. The content depends on the role (see below) | Any | ✓ |
+| `/companies` | Company list, create/edit, deactivate/restore | super_admin | ✓ |
+| `/users` | User list, create/edit, deactivate/restore | super_admin | ✓ |
+| `/properties` | Property list (with `P-0001` numbers), create/edit, deactivate/restore | client_admin | ✓ |
+| `/tenants` | Tenant list, create/edit, deactivate/restore | client_admin | ✓ |
+| `/leases` | Lease list, create/edit, change status, change rent | client_admin | ✓ |
+| `/leases/[id]` | Lease detail: ledger statement, charges, payments, PDFs | client_admin | via lease list |
+| `/ledger` | Company-wide ledger, filterable by lease | client_admin | URL only |
+| `/payments` | Company-wide payments list | client_admin | URL only |
+
+The sidebar filters links by `roles` in [src/config/navigation.ts](src/config/navigation.ts). Every page is also wrapped in [`RequireRole`](src/components/layout/require-role.tsx), which reads `GET /auth/me`. The backend enforces the same rules, so the UI checks only keep the screens consistent with what the API allows.
+
+---
+
+## Project structure
 
 ```
-src/
-├── app/
-│   ├── [locale]/            # Localised routes (en, ur)
-│   │   ├── layout.tsx       # Root html/body, dir, fonts, providers
-│   │   ├── login/           # Login page — no app chrome
-│   │   └── (dashboard)/     # Everything behind the auth guard
-│   │       ├── layout.tsx   # Sidebar + main shell
-│   │       ├── page.tsx     # Dashboard overview
-│   │       ├── companies/   # Company administration
-│   │       └── users/       # User administration
-│   └── globals.css          # Theme tokens + base layer
-├── components/
-│   ├── layout/              # Sidebar, nav, user menu, role guard, switchers
-│   ├── providers/           # Theme, TanStack Query, toast providers
-│   └── ui/                  # Presentational primitives (table, modal, badge…)
-├── config/                  # Site, auth, roles, navigation, pagination
-├── features/                # Feature slices
-│   ├── auth/
-│   ├── companies/
-│   ├── dashboard/
-│   └── users/
-│       ├── api/             # Client fetchers + query keys
-│       ├── components/      # View, table, form dialog
-│       ├── hooks/           # useQuery / useMutation wrappers
-│       ├── schemas/         # Zod input schemas
-│       └── types/           # Component prop interfaces
-├── hooks/                   # Shared hooks (form state, debounce, toast)
-├── i18n/                    # routing, navigation, request config
-├── lib/                     # Axios instance, query client, session cookies
-├── types/                   # Shared interfaces (I-prefixed)
-├── utils/                   # Generic helpers (cn, format, cookie, query-params…)
-└── proxy.ts                 # Locale + auth proxy (Next 16 middleware convention)
-messages/                    # en.json, ur.json
+rms-frontend/
+├── messages/                    # en.json, ur.json translation catalogues
+├── public/
+├── next.config.ts
+└── src/
+    ├── proxy.ts                 # Next 16 "proxy" (middleware): locale prefix + auth redirect
+    ├── app/
+    │   ├── globals.css          # OKLCH theme tokens (:root / .dark) + base layer
+    │   ├── icon.svg
+    │   └── [locale]/
+    │       ├── layout.tsx       # <html lang dir>, fonts (Noto Nastaliq for Urdu), providers
+    │       ├── login/page.tsx   # No app chrome
+    │       └── (dashboard)/     # Signed-in shell
+    │           ├── layout.tsx   # Sidebar + main area
+    │           ├── page.tsx     # DashboardRouter
+    │           ├── companies/   users/                     # super_admin
+    │           ├── properties/  tenants/  leases/  leases/[id]/  ledger/  payments/   # client_admin
+    ├── components/
+    │   ├── layout/              # app-sidebar, app-nav, user-menu, require-role, page-heading,
+    │   │                        # language-switcher, theme-toggle, powered-by
+    │   ├── providers/           # app, query, theme, toast providers
+    │   └── ui/                  # alert, badge, button, card, confirm-dialog, date(-time)-picker,
+    │                            # empty-state, form-field, form-grid, input, modal, pagination,
+    │                            # radio-group, search-input, select, skeleton, stat-card, table, textarea
+    ├── config/                  # site, auth (cookies/endpoints), roles, navigation, pagination, phone, property
+    ├── features/                # One slice per backend module
+    │   ├── auth/  companies/  users/  dashboard/
+    │   ├── properties/  tenants/  leases/  ledger/  payments/
+    │   └── <feature>/
+    │       ├── api/             # <feature>.api.ts fetchers + <feature>-keys.ts query keys
+    │       ├── components/      # <feature>-view, -table, -form-dialog (+ feature-specific dialogs)
+    │       ├── hooks/           # use-<feature>s (list), use-save-<feature>, use-<feature>-status,
+    │       │                    # use-<feature>-options (for selects)
+    │       ├── schemas/         # Zod schemas mirroring the backend DTOs
+    │       └── types/           # Component prop interfaces
+    ├── hooks/                   # use-debounced-value, use-form-state, use-is-hydrated, use-toast
+    ├── i18n/                    # routing (locales), navigation (localised Link/router), request config
+    ├── lib/
+    │   ├── api-client.ts        # Axios instance: base URL, bearer token, envelope unwrap, 401 refresh
+    │   ├── auth-session.ts      # Read/write/clear the token cookies
+    │   └── query-client.ts      # TanStack QueryClient factory
+    ├── types/                   # Shared I-prefixed interfaces / T-prefixed unions, one file per domain
+    └── utils/                   # cn, format (currency/date), cookie, query-params, status, period,
+                                 # lease label, ledger-display, pdf / invoice-pdf / ledger-pdf, zod helpers
 ```
 
-## Super admin flow
+---
 
-`/companies` and `/users` are super_admin-only on the backend, and the UI mirrors that:
-the sidebar hides both links for other roles, and each page is wrapped in
-[`RequireRole`](src/components/layout/require-role.tsx), which reads `GET /auth/me`.
+## User flows
 
-Both screens follow the same shape, matching the backend's list contract — paginated,
-searchable, newest first:
+### Sign in
 
-- debounced search, plus filters (status; role and company on users),
-- a create/edit dialog validated with Zod schemas that mirror the backend DTOs, so the
-  common mistakes are caught before a request goes out,
-- deactivate/reactivate through a confirm dialog. `DELETE` is a soft delete: it flips
-  `status` to false and `PATCH /:id/restore` flips it back, so rows are never lost.
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant P as proxy.ts
+  participant F as Login form
+  participant API as Backend
+  U->>P: GET /en/leases
+  P-->>U: no rms_access_token cookie → redirect /en/login
+  U->>F: email + password (Zod validated)
+  F->>API: POST /auth/login
+  API-->>F: {accessToken, refreshToken, user}
+  F->>F: store both cookies (7-day max-age)
+  F-->>U: redirect /en  → DashboardRouter
+```
 
-Backend rules the forms reflect: a `super_admin` cannot belong to a company, a company
-cannot be deactivated while it still has active users, and passwords cannot be changed
-through `PATCH /users/:id` — `UpdateUserDto` omits the field, so the edit dialog does not
-offer it.
+### Super admin: onboard a company
 
-The dashboard reads its counters from the same list endpoints (`meta.totalItems` with
-`limit=1`), so no extra backend route is needed.
+1. **Companies → New.** Enter the name, contact details and city. Optionally add the company's SMTP email and mail password and turn on **invoice email**, so that generated rent invoices go to that company's tenants.
+2. **Users → New.** Create a `client_admin` and assign it to the company. The backend emails the login details to the new user.
+3. **Dashboard.** The counters come from the list endpoints (`meta.totalItems` with `limit=1`), and there are lists of recently added companies and users. The **Generate monthly rent** button calls `POST /ledger/generate-monthly-rent` for every company and reports what was generated and what was skipped.
 
-## Language switching
+The forms follow the backend rules: a `super_admin` can't be given a company, a company can't be deactivated while it still has active users, and leaving the password blank in the edit dialog keeps the current one. Entering a new one triggers a password-changed email.
 
-Locale lives in the URL (`/en/...`, `/ur/...`) and is resolved by [src/proxy.ts](src/proxy.ts).
-`<html lang dir>` is set per request, and Urdu loads Noto Nastaliq Urdu automatically.
+### Client admin: day-to-day
 
-Use logical CSS properties (`ms-*`, `me-*`, `ps-*`, `pe-*`, `text-start`, `text-end`) so
-layouts mirror correctly in RTL.
+```mermaid
+flowchart LR
+  A[Properties<br/>add unit, rent due day] --> C[Leases<br/>pick property + tenant,<br/>dates, rent, advance, document link]
+  B[Tenants<br/>add person] --> C
+  C --> D[Lease detail]
+  D --> E[Add charge<br/>bill / adjustment / advance]
+  D --> F[Record payment<br/>cash / bank / cheque / online]
+  D --> G[Change rent<br/>new amount + effective date]
+  D --> H[Change status<br/>active / terminated / expired]
+  D --> I[Invoice PDF<br/>this month's charges − payments]
+  D --> J[Ledger PDF<br/>statement for the chosen period]
+```
 
-Add a locale by extending `locales` in [src/i18n/routing.ts](src/i18n/routing.ts) and adding a
-matching file in [messages/](messages/); mark it RTL in [src/utils/direction.ts](src/utils/direction.ts).
+- **Dashboard.** Stat cards (tenants, properties, active leases, this month's payments compared with last month), a payments trend chart (6 months, 1 year or all time), a property status breakdown, recent payments, and the leases with the most outstanding.
+- **Lease detail** (`/leases/[id]`) is the main working screen. It shows the lease, its outstanding balance and the full ledger with running balances. It supports search and a period filter (all, current month, last month, last 3 months, last 6 months). From here the admin can add charges, record payments, deactivate or restore entries, change the rent or status, and open the PDFs.
+- **Deactivate, don't delete.** Every destructive action asks for confirmation and only sets `status` to false. A deactivated ledger entry stays on the statement, struck through and faded, and no longer counts towards the balance. Restoring it adds it back.
+- **PDFs** are built in the browser by [invoice-pdf.ts](src/utils/invoice-pdf.ts) and [ledger-pdf.ts](src/utils/ledger-pdf.ts), and open in a new tab. Each has the company name, an `INV-` / `LDG-` document number, the property number, the lease term and a "Powered by" footer.
 
-## Theming
+### Lists
 
-Colours are OKLCH custom properties in [src/app/globals.css](src/app/globals.css): `:root` for
-light, `.dark` for dark, exposed to Tailwind via `@theme inline`. Use semantic classes
-(`bg-card`, `text-muted-foreground`, `border-border`) rather than raw palette values.
+Every list screen works the same way, matching the backend's list contract (paginated, searchable, newest first):
+
+- debounced search plus filters (status everywhere, plus role and company on users, and property, tenant or status on leases),
+- server-side pagination through the shared `Pagination` component,
+- a create/edit dialog validated by a Zod schema that mirrors the backend DTO, so common mistakes are caught before a request goes out. If the backend rejects a request, the dialog shows the API's message in an alert. Successful saves show a toast.
+
+---
 
 ## Data fetching
 
-Every call goes through the shared Axios instance in
-[src/lib/api-client.ts](src/lib/api-client.ts), which:
+Every call goes through the shared Axios instance in [src/lib/api-client.ts](src/lib/api-client.ts), which:
 
 - prefixes `NEXT_PUBLIC_API_BASE_URL`,
 - attaches `Authorization: Bearer <access token>` from the session cookie,
 - unwraps the backend `{ success, message, data, error }` envelope so callers receive `data`,
-- normalises every failure into `IApiError` (`status`, `code`, `message`, `details`),
-- on a `401`, refreshes once through `/auth/refresh` and replays the request; concurrent
-  401s share a single refresh call. If the refresh fails, the session is cleared and the
-  user is sent to the login page.
+- turns every failure into an `IApiError` (`status`, `code`, `message`, `details`),
+- on a `401`, refreshes once through `/auth/refresh` and retries the request. Concurrent 401s share a single refresh call. If the refresh fails, the session is cleared and the user is sent to the login page.
 
-Feature slices own their fetchers, query keys and hooks — see
-[src/features/auth/](src/features/auth/). Query keys are centralised per feature
-(`authKeys`) so invalidation stays predictable.
+Each feature slice owns its fetchers, query keys and hooks. Query keys are kept in one place per feature (`leaseKeys`, `ledgerKeys`, ...), and mutations invalidate the affected keys. For example, recording a payment refreshes the payments list, the ledger and the lease balance.
 
-Server components may still prefetch into a per-request `QueryClient` and pass it through
-`HydrationBoundary`; client hooks then read the hydrated cache without a second request.
+---
 
-## Auth
+## Auth and session
 
-`POST /auth/login` returns a token pair plus the user. Tokens are stored in the
-`rms_access_token` / `rms_refresh_token` cookies (see
-[src/lib/auth-session.ts](src/lib/auth-session.ts)) so that
-[src/proxy.ts](src/proxy.ts) can guard routes at the edge: an anonymous request to any
-route is redirected to `/{locale}/login`, and a signed-in request to the login page is
-redirected back to `/{locale}`.
+- `POST /auth/login` returns a token pair and the user. The tokens are stored in the `rms_access_token` and `rms_refresh_token` cookies ([src/lib/auth-session.ts](src/lib/auth-session.ts)). Both cookies last as long as the backend refresh token (7 days), so an expired access token is refreshed silently.
+- [src/proxy.ts](src/proxy.ts) guards routes before the page renders. An anonymous request is redirected to `/{locale}/login`, and a signed-in request to the login page is redirected to `/{locale}`.
+- The cookies are written client-side, so JavaScript can read them. If the backend ever sets `httpOnly` cookies itself, remove `auth-session.ts` and have the proxy read the cookie names directly.
+- Route names, cookie names and auth endpoints are in [src/config/auth.ts](src/config/auth.ts).
 
-Cookies are written client-side and are therefore readable by JavaScript. If the backend
-later sets `httpOnly` cookies itself, drop `auth-session.ts` and read the cookie names
-directly in the proxy.
+---
 
-Route names and cookie names live in [src/config/auth.ts](src/config/auth.ts).
+## Language switching
+
+The locale is part of the URL (`/en/...`, `/ur/...`) and is resolved by [src/proxy.ts](src/proxy.ts). `<html lang dir>` is set per request, and Urdu loads Noto Nastaliq Urdu automatically.
+
+Use logical CSS properties (`ms-*`, `me-*`, `ps-*`, `pe-*`, `text-start`, `text-end`) so layouts mirror correctly in RTL. Generated PDFs are always in English.
+
+To add a locale, extend `locales` in [src/i18n/routing.ts](src/i18n/routing.ts) and add a matching file in [messages/](messages/). If it is RTL, mark it in [src/utils/direction.ts](src/utils/direction.ts).
+
+---
+
+## Theming
+
+Colours are OKLCH custom properties in [src/app/globals.css](src/app/globals.css): `:root` for light and `.dark` for dark, exposed to Tailwind via `@theme inline`. Use the semantic classes (`bg-card`, `text-muted-foreground`, `border-border`) rather than raw palette values.
+
+---
+
+## Conventions
+
+- **Types.** No `any`. Interfaces start with `I` and live under `src/types/` or the feature's `types/` folder, never inline next to the component.
+- **Styling.** No inline styles. Use Tailwind classes, with `cn()` to merge them.
+- **Helpers.** Reusable helpers belong in `src/utils/` or `src/hooks/`, written generically.
+- **Style.** Comments are one line at most. Use `const` by default and camelCase.
+- **Next.js 16** has breaking changes compared with older versions. Read [AGENTS.md](AGENTS.md) and the bundled docs in `node_modules/next/dist/docs/` before changing routing or proxy code.
