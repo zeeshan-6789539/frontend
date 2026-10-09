@@ -1,6 +1,6 @@
 # RMS Frontend
 
-**Rent Management System UI**: the admin web app for the multi-company rent platform. Super admins use it to onboard companies and users. Company admins use it to run properties, tenants, leases, ledgers and payments, and to print invoices and statements.
+**Rent Management System UI**: the admin web app for the multi-company rent platform. Super admins use it to onboard companies and users. Company admins use it to run properties, tenants, leases, ledgers and payments, to print invoices and statements, and to ask an AI assistant about their data by typing or by voice.
 
 Next.js 16 (App Router + Turbopack). The API is in the sibling repo [`rms-backend`](../rms-backend/README.md), which also documents the full database schema and business rules.
 
@@ -34,6 +34,7 @@ Next.js 16 (App Router + Turbopack). The API is in the sibling repo [`rms-backen
 | Charts | Recharts 3 |
 | PDF | jsPDF + jspdf-autotable (built in the browser) |
 | Icons | lucide-react |
+| Voice | Browser Web Speech API (speech-to-text and text-to-speech), no extra package |
 
 ---
 
@@ -80,6 +81,7 @@ Every route has a locale prefix (`/en/...`, `/ur/...`).
 | `/leases/[id]` | Lease detail: ledger statement, charges, payments, PDFs | client_admin | via lease list |
 | `/ledger` | Company-wide ledger, filterable by lease | client_admin | URL only |
 | `/payments` | Company-wide payments list | client_admin | URL only |
+| Every signed-in page | AI assistant: floating button, bottom corner | client_admin | — |
 
 The sidebar filters links by `roles` in [src/config/navigation.ts](src/config/navigation.ts). Every page is also wrapped in [`RequireRole`](src/components/layout/require-role.tsx), which reads `GET /auth/me`. The backend enforces the same rules, so the UI checks only keep the screens consistent with what the API allows.
 
@@ -112,10 +114,11 @@ rms-frontend/
     │   └── ui/                  # alert, badge, button, card, confirm-dialog, date(-time)-picker,
     │                            # empty-state, form-field, form-grid, input, modal, pagination,
     │                            # radio-group, search-input, select, skeleton, stat-card, table, textarea
-    ├── config/                  # site, auth (cookies/endpoints), roles, navigation, pagination, phone, property
+    ├── config/                  # site, auth (cookies/endpoints), roles, navigation, pagination, phone, property, assistant
     ├── features/                # One slice per backend module
     │   ├── auth/  companies/  users/  dashboard/
     │   ├── properties/  tenants/  leases/  ledger/  payments/
+    │   ├── assistant/           # AI chat panel + voice (launcher, panel, composer, use-assistant-chat)
     │   └── <feature>/
     │       ├── api/             # <feature>.api.ts fetchers + <feature>-keys.ts query keys
     │       ├── components/      # <feature>-view, -table, -form-dialog (+ feature-specific dialogs)
@@ -123,7 +126,8 @@ rms-frontend/
     │       │                    # use-<feature>-options (for selects)
     │       ├── schemas/         # Zod schemas mirroring the backend DTOs
     │       └── types/           # Component prop interfaces
-    ├── hooks/                   # use-debounced-value, use-form-state, use-is-hydrated, use-toast
+    ├── hooks/                   # use-debounced-value, use-form-state, use-is-hydrated, use-toast,
+    │                            # use-speech-recognition, use-speech-synthesis
     ├── i18n/                    # routing (locales), navigation (localised Link/router), request config
     ├── lib/
     │   ├── api-client.ts        # Axios instance: base URL, bearer token, envelope unwrap, 401 refresh
@@ -131,7 +135,7 @@ rms-frontend/
     │   └── query-client.ts      # TanStack QueryClient factory
     ├── types/                   # Shared I-prefixed interfaces / T-prefixed unions, one file per domain
     └── utils/                   # cn, format (currency/date), cookie, query-params, status, period,
-                                 # lease label, ledger-display, pdf / invoice-pdf / ledger-pdf, zod helpers
+                                 # lease label, ledger-display, pdf / invoice-pdf / ledger-pdf, zod helpers, speech
 ```
 
 ---
@@ -182,6 +186,10 @@ flowchart LR
 - **Lease detail** (`/leases/[id]`) is the main working screen. It shows the lease, its outstanding balance and the full ledger with running balances. It supports search and a period filter (all, current month, last month, last 3 months, last 6 months). From here the admin can add charges, record payments, deactivate or restore entries, change the rent or status, and open the PDFs.
 - **Deactivate, don't delete.** Every destructive action asks for confirmation and only sets `status` to false. A deactivated ledger entry stays on the statement, struck through and faded, and no longer counts towards the balance. Restoring it adds it back.
 - **PDFs** are built in the browser by [invoice-pdf.ts](src/utils/invoice-pdf.ts) and [ledger-pdf.ts](src/utils/ledger-pdf.ts), and open in a new tab. Each has the company name, an `INV-` / `LDG-` document number, the property number, the lease term and a "Powered by" footer.
+- **AI assistant.** A floating button opens a chat panel that calls the backend's `POST /ai/chat` (Gemini). For example: "who still owes rent?", "summarise this month", "when did Ahmed Raza last pay?". It is read-only for now.
+  - **Voice.** The mic button uses the browser's speech recognition in the current locale (`en-US` or `ur-PK`) and sends the question as soon as the user stops speaking. Answers to spoken questions are read aloud; the speaker button turns this off and the stop button cuts it short. Typed questions are never read aloud.
+  - **Browser support.** Voice input needs Chrome or Edge, and the mic button is disabled elsewhere. Urdu read-aloud needs an Urdu voice installed in the OS. Without one, the browser falls back to its default voice.
+  - **Conversation state.** The backend is stateless, so [use-assistant-chat.ts](src/features/assistant/hooks/use-assistant-chat.ts) keeps the conversation and replays the last 20 turns as `history`. Closing the panel keeps the conversation; reloading the page clears it.
 
 ### Lists
 

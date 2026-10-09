@@ -513,5 +513,36 @@
       "dueDateInvalid": "Enter a valid date.",
       "descriptionLength": "Description must be at most 500 characters."
     }
+  },
+  "assistant": {
+    "open": "Ask the AI assistant",
+    "title": "AI assistant",
+    "subtitle": "Ask about properties, tenants, leases and payments",
+    "assistantLabel": "Assistant",
+    "you": "You",
+    "placeholder": "Type a question or tap the mic…",
+    "send": "Send",
+    "startListening": "Ask by voice",
+    "stopListening": "Stop listening",
+    "listening": "Listening…",
+    "micUnsupported": "Voice input isn't available in this browser. Use Chrome or Edge.",
+    "micErrors": {
+      "notAllowed": "Microphone access is blocked. Allow it in your browser's site settings, then try again.",
+      "noSpeech": "I didn't hear anything. Tap the mic and try again.",
+      "other": "Voice input stopped unexpectedly. Try again or type your question."
+    },
+    "voiceReplyOn": "Spoken replies on (click to turn off)",
+    "voiceReplyOff": "Spoken replies off (click to turn on)",
+    "stopSpeaking": "Stop speaking",
+    "clear": "Clear conversation",
+    "thinking": "Looking that up…",
+    "notSent": "Not answered",
+    "emptyTitle": "How can I help?",
+    "emptyDescription": "Ask in your own words, or tap the mic and speak. I can read your data but not change it yet.",
+    "suggestions": {
+      "summary": "Give me a summary of this month",
+      "owing": "Which tenants still owe rent?",
+      "endingLeases": "Which leases end in the next three months?"
+    }
   }
 }

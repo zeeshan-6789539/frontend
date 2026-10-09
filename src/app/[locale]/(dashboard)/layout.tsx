@@ -1,5 +1,6 @@
 import { setRequestLocale } from "next-intl/server";
 import { AppSidebar } from "@/components/layout/app-sidebar";
+import { AssistantLauncher } from "@/features/assistant/components/assistant-launcher";
 
 const DashboardLayout = async ({
   children,
@@ -16,6 +17,7 @@ const DashboardLayout = async ({
           {children}
         </main>
       </div>
+      <AssistantLauncher />
     </div>
   );
 };
