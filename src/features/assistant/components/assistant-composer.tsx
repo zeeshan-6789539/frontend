@@ -77,7 +77,10 @@ export const AssistantComposer = ({
       : t("startListening");
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-2 border-t border-border px-4 py-3">
+    <form
+      onSubmit={handleSubmit}
+      className="mx-auto w-full max-w-3xl space-y-2 px-4 pt-2 pb-4 sm:px-0 sm:pb-6"
+    >
       {recorder.isRecording ? (
         <p aria-live="polite" className="text-sm text-primary">
           {t("listening")}
@@ -100,7 +103,7 @@ export const AssistantComposer = ({
         </p>
       ) : null}
 
-      <div className="flex items-end gap-2">
+      <div className="flex items-end gap-2 rounded-3xl border border-input bg-muted/50 p-2 ps-4 shadow-sm transition-colors focus-within:border-ring">
         <Textarea
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
@@ -109,7 +112,7 @@ export const AssistantComposer = ({
           aria-label={t("placeholder")}
           maxLength={ASSISTANT_MESSAGE_MAX_LENGTH}
           rows={1}
-          className="max-h-32 min-h-10 resize-none"
+          className="max-h-48 min-h-10 resize-none border-0 bg-transparent px-0 py-2.5 text-base shadow-none focus:ring-0"
         />
         <Button
           type="button"
@@ -119,7 +122,7 @@ export const AssistantComposer = ({
           disabled={!recorder.isSupported || isBusy}
           aria-label={micLabel}
           title={micLabel}
-          className={cn("h-10 w-10 shrink-0", recorder.isRecording && "animate-pulse")}
+          className={cn("h-10 w-10 shrink-0 rounded-full", recorder.isRecording && "animate-pulse")}
         >
           {recorder.isRecording ? (
             <Square className="h-4 w-4" aria-hidden />
@@ -133,7 +136,7 @@ export const AssistantComposer = ({
           disabled={!draft.trim() || isBusy}
           aria-label={t("send")}
           title={t("send")}
-          className="h-10 w-10 shrink-0"
+          className="h-10 w-10 shrink-0 rounded-full"
         >
           <Send className="h-4 w-4 rtl:-scale-x-100" aria-hidden />
         </Button>

@@ -11,23 +11,22 @@ export const AssistantSuggestions = ({ isDisabled, onPick }: IAssistantSuggestio
   const t = useTranslations("assistant");
 
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-4 px-2 text-center">
-      <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-primary-soft-foreground">
-        <Sparkles className="h-6 w-6" aria-hidden />
+    <div className="flex flex-1 flex-col items-center justify-center gap-8 px-2 text-center">
+      <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-brand-gradient text-primary-foreground shadow-brand">
+        <Sparkles className="h-8 w-8" aria-hidden />
       </span>
-      <div className="space-y-1">
-        <p className="font-medium">{t("emptyTitle")}</p>
-        <p className="text-sm text-muted-foreground">{t("emptyDescription")}</p>
+      <div className="space-y-2">
+        <p className="text-2xl font-semibold tracking-tight sm:text-3xl">{t("emptyTitle")}</p>
+        <p className="text-base text-muted-foreground">{t("emptyDescription")}</p>
       </div>
-      <div className="flex w-full flex-col gap-2">
+      <div className="grid w-full gap-3 sm:grid-cols-3">
         {SUGGESTION_KEYS.map((key) => (
           <Button
             key={key}
             variant="outline"
-            size="sm"
             disabled={isDisabled}
             onClick={() => onPick(t(`suggestions.${key}`))}
-            className="h-auto justify-start whitespace-normal py-2 text-start"
+            className="h-auto min-h-20 items-start justify-start whitespace-normal rounded-2xl p-4 text-start text-sm"
           >
             {t(`suggestions.${key}`)}
           </Button>
