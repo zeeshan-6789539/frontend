@@ -34,7 +34,7 @@ Next.js 16 (App Router + Turbopack). The API is in the sibling repo [`rms-backen
 | Charts | Recharts 3 |
 | PDF | jsPDF + jspdf-autotable (built in the browser) |
 | Icons | lucide-react |
-| Voice | Browser Web Speech API (speech-to-text and text-to-speech), no extra package |
+| Voice | Browser mic recording (`AudioWorklet` → 16 kHz WAV) with transcription and an Urdu-accent voice from the backend's Gemini routes; browser `speechSynthesis` only as fallback. No extra package |
 
 ---
 
@@ -127,7 +127,7 @@ rms-frontend/
     │       ├── schemas/         # Zod schemas mirroring the backend DTOs
     │       └── types/           # Component prop interfaces
     ├── hooks/                   # use-debounced-value, use-form-state, use-is-hydrated, use-toast,
-    │                            # use-speech-recognition, use-speech-synthesis
+    │                            # use-audio-recorder, use-speech-synthesis
     ├── i18n/                    # routing (locales), navigation (localised Link/router), request config
     ├── lib/
     │   ├── api-client.ts        # Axios instance: base URL, bearer token, envelope unwrap, 401 refresh
@@ -135,7 +135,8 @@ rms-frontend/
     │   └── query-client.ts      # TanStack QueryClient factory
     ├── types/                   # Shared I-prefixed interfaces / T-prefixed unions, one file per domain
     └── utils/                   # cn, format (currency/date), cookie, query-params, status, period,
-                                 # lease label, ledger-display, pdf / invoice-pdf / ledger-pdf, zod helpers, speech
+                                 # lease label, ledger-display, pdf / invoice-pdf / ledger-pdf, zod helpers,
+                                 # speech, wav (downsample + encode), base64
 ```
 
 ---
@@ -186,9 +187,10 @@ flowchart LR
 - **Lease detail** (`/leases/[id]`) is the main working screen. It shows the lease, its outstanding balance and the full ledger with running balances. It supports search and a period filter (all, current month, last month, last 3 months, last 6 months). From here the admin can add charges, record payments, deactivate or restore entries, change the rent or status, and open the PDFs.
 - **Deactivate, don't delete.** Every destructive action asks for confirmation and only sets `status` to false. A deactivated ledger entry stays on the statement, struck through and faded, and no longer counts towards the balance. Restoring it adds it back.
 - **PDFs** are built in the browser by [invoice-pdf.ts](src/utils/invoice-pdf.ts) and [ledger-pdf.ts](src/utils/ledger-pdf.ts), and open in a new tab. Each has the company name, an `INV-` / `LDG-` document number, the property number, the lease term and a "Powered by" footer.
-- **AI assistant.** A floating button opens a chat panel that calls the backend's `POST /ai/chat` (Gemini). For example: "who still owes rent?", "summarise this month", "when did Ahmed Raza last pay?". It is read-only for now.
-  - **Voice.** The mic button uses the browser's speech recognition in the current locale (`en-US` or `ur-PK`) and sends the question as soon as the user stops speaking. Answers to spoken questions are read aloud; the speaker button turns this off and the stop button cuts it short. Typed questions are never read aloud.
-  - **Browser support.** Voice input needs Chrome or Edge, and the mic button is disabled elsewhere. Urdu read-aloud needs an Urdu voice installed in the OS. Without one, the browser falls back to its default voice.
+- **AI assistant.** A floating button opens a chat panel that calls the backend's `POST /ai/chat` (Gemini). For example: "who still owes rent?", "is mahine kis kis ka kiraya baqi hai?", "summarise this month". It understands English, Urdu script and Roman Urdu, and replies in the same one. It is read-only for now.
+  - **Voice input.** The mic records with [use-audio-recorder.ts](src/hooks/use-audio-recorder.ts), which stops by itself after a 1.5 s pause (30 s at most). The clip is sent as 16 kHz WAV to `POST /ai/transcribe`, and the transcript is asked as a question. Gemini copes with mixed Urdu-English speech. Urdu words come back in Urdu script on the Urdu UI and in Roman Urdu on the English UI ([config/assistant.ts](src/config/assistant.ts)). A clip with no speech never leaves the browser.
+  - **Voice output.** Answers to spoken questions are read aloud by `POST /ai/speech`, which uses a Gemini voice with a Pakistani Urdu accent. Each assistant bubble also has a 🔊 button to replay any answer, typed or spoken. The header speaker button turns automatic read-aloud off, and the stop button cuts it short. A reply takes a few seconds to voice, so the text appears first. If the Gemini voice fails, the browser's own voice takes over.
+  - **Browser support.** Works in any browser with microphone access and `AudioWorklet` (Chrome, Edge, Firefox, Safari).
   - **Conversation state.** The backend is stateless, so [use-assistant-chat.ts](src/features/assistant/hooks/use-assistant-chat.ts) keeps the conversation and replays the last 20 turns as `history`. Closing the panel keeps the conversation; reloading the page clears it.
 
 ### Lists

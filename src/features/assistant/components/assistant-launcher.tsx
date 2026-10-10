@@ -4,11 +4,11 @@ import { useCallback, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { SPEECH_LANGUAGES } from "@/config/assistant";
+import { SPEECH_LANGUAGES, TRANSCRIPT_SCRIPTS } from "@/config/assistant";
 import { AssistantPanel } from "@/features/assistant/components/assistant-panel";
 import { useAssistantChat } from "@/features/assistant/hooks/use-assistant-chat";
+import { useAssistantVoice } from "@/features/assistant/hooks/use-assistant-voice";
 import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
-import { useSpeechSynthesis } from "@/hooks/use-speech-synthesis";
 import type { TLocale } from "@/types/locale";
 
 // The conversation lives here so closing the panel keeps it; only client admins can use /ai/chat
@@ -19,9 +19,8 @@ export const AssistantLauncher = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVoiceReplyOn, setIsVoiceReplyOn] = useState(true);
   const chat = useAssistantChat();
-  const synthesis = useSpeechSynthesis();
-  const { cancel } = synthesis;
-  const speechLang = SPEECH_LANGUAGES[locale];
+  const voice = useAssistantVoice(SPEECH_LANGUAGES[locale]);
+  const { cancel } = voice;
 
   const close = useCallback(() => {
     cancel();
@@ -30,11 +29,9 @@ export const AssistantLauncher = () => {
 
   if (user?.role !== "client_admin") return null;
 
-  // Spoken questions get spoken answers; typed ones stay silent
+  // Spoken questions get spoken answers; typed ones stay silent unless replayed
   const send = (text: string, isVoice: boolean) => {
-    const shouldSpeak = isVoice && isVoiceReplyOn && synthesis.isSupported;
-
-    chat.send(text, shouldSpeak ? (reply) => synthesis.speak(reply, speechLang) : undefined);
+    chat.send(text, isVoice && isVoiceReplyOn ? voice.speak : undefined);
   };
 
   const toggleVoiceReply = () => {
@@ -65,11 +62,12 @@ export const AssistantLauncher = () => {
       messages={chat.messages}
       isPending={chat.isPending}
       error={chat.error}
-      speechLang={speechLang}
-      canSpeak={synthesis.isSupported}
-      isSpeaking={synthesis.isSpeaking}
+      transcriptScript={TRANSCRIPT_SCRIPTS[locale]}
+      isVoiceBusy={voice.isPreparing || voice.isPlaying}
+      isVoicePreparing={voice.isPreparing}
       isVoiceReplyOn={isVoiceReplyOn}
       onSend={send}
+      onPlay={voice.speak}
       onClear={clear}
       onClose={close}
       onStopSpeaking={cancel}

@@ -15,11 +15,12 @@ export const AssistantPanel = ({
   messages,
   isPending,
   error,
-  speechLang,
-  canSpeak,
-  isSpeaking,
+  transcriptScript,
+  isVoiceBusy,
+  isVoicePreparing,
   isVoiceReplyOn,
   onSend,
+  onPlay,
   onClear,
   onClose,
   onStopSpeaking,
@@ -58,10 +59,12 @@ export const AssistantPanel = ({
           <h2 id="assistant-title" className="truncate font-semibold tracking-tight">
             {t("title")}
           </h2>
-          <p className="truncate text-xs text-muted-foreground">{t("subtitle")}</p>
+          <p className="truncate text-xs text-muted-foreground">
+            {isVoicePreparing ? t("preparingVoice") : t("subtitle")}
+          </p>
         </div>
 
-        {isSpeaking ? (
+        {isVoiceBusy ? (
           <Button
             variant="ghost"
             size="icon"
@@ -69,25 +72,27 @@ export const AssistantPanel = ({
             aria-label={t("stopSpeaking")}
             title={t("stopSpeaking")}
           >
-            <Square className="h-4 w-4" aria-hidden />
-          </Button>
-        ) : null}
-        {canSpeak ? (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onToggleVoiceReply}
-            aria-pressed={isVoiceReplyOn}
-            aria-label={voiceReplyLabel}
-            title={voiceReplyLabel}
-          >
-            {isVoiceReplyOn ? (
-              <Volume2 className="h-4 w-4" aria-hidden />
+            {isVoicePreparing ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
             ) : (
-              <VolumeX className="h-4 w-4" aria-hidden />
+              <Square className="h-4 w-4" aria-hidden />
             )}
           </Button>
         ) : null}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onToggleVoiceReply}
+          aria-pressed={isVoiceReplyOn}
+          aria-label={voiceReplyLabel}
+          title={voiceReplyLabel}
+        >
+          {isVoiceReplyOn ? (
+            <Volume2 className="h-4 w-4" aria-hidden />
+          ) : (
+            <VolumeX className="h-4 w-4" aria-hidden />
+          )}
+        </Button>
         <Button
           variant="ghost"
           size="icon"
@@ -107,7 +112,9 @@ export const AssistantPanel = ({
         {messages.length === 0 && !isPending ? (
           <AssistantSuggestions isDisabled={isPending} onPick={(text) => onSend(text, false)} />
         ) : (
-          messages.map((message) => <AssistantMessageBubble key={message.id} message={message} />)
+          messages.map((message) => (
+            <AssistantMessageBubble key={message.id} message={message} onPlay={onPlay} />
+          ))
         )}
 
         {isPending ? (
@@ -123,7 +130,7 @@ export const AssistantPanel = ({
 
       <AssistantComposer
         isPending={isPending}
-        speechLang={speechLang}
+        transcriptScript={transcriptScript}
         onSend={onSend}
         onListenStart={onStopSpeaking}
       />

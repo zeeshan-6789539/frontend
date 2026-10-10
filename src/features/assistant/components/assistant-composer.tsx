@@ -2,16 +2,18 @@
 
 import { useState, type FormEvent, type KeyboardEvent } from "react";
 import { useTranslations } from "next-intl";
-import { Mic, Send, Square } from "lucide-react";
+import { Loader2, Mic, Send, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ASSISTANT_MESSAGE_MAX_LENGTH } from "@/config/assistant";
-import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
+import { useTranscribeSpeech } from "@/features/assistant/hooks/use-transcribe-speech";
+import { useAudioRecorder } from "@/hooks/use-audio-recorder";
+import { getApiErrorMessage } from "@/utils/api";
 import { cn } from "@/utils/cn";
 import type { IAssistantComposerProps } from "@/features/assistant/types/assistant-components";
-import type { TSpeechRecognitionError } from "@/types/speech";
+import type { TAudioRecorderError } from "@/types/speech";
 
-const MIC_ERROR_KEYS: Record<TSpeechRecognitionError, string> = {
+const MIC_ERROR_KEYS: Record<TAudioRecorderError, string> = {
   "not-allowed": "micErrors.notAllowed",
   "no-speech": "micErrors.noSpeech",
   other: "micErrors.other",
@@ -19,19 +21,26 @@ const MIC_ERROR_KEYS: Record<TSpeechRecognitionError, string> = {
 
 export const AssistantComposer = ({
   isPending,
-  speechLang,
+  transcriptScript,
   onSend,
   onListenStart,
 }: IAssistantComposerProps) => {
   const t = useTranslations("assistant");
+  const tCommon = useTranslations("common");
   const [draft, setDraft] = useState("");
-  const speech = useSpeechRecognition({
-    lang: speechLang,
-    onResult: (transcript) => onSend(transcript, true),
+  const transcription = useTranscribeSpeech();
+  const recorder = useAudioRecorder({
+    onRecorded: ({ base64, mimeType }) =>
+      transcription.mutate(
+        { audioBase64: base64, mimeType, script: transcriptScript },
+        { onSuccess: ({ transcript }) => onSend(transcript, true) },
+      ),
   });
+  const isTranscribing = transcription.isPending;
+  const isBusy = isPending || isTranscribing;
 
   const submit = () => {
-    if (!draft.trim() || isPending) return;
+    if (!draft.trim() || isBusy) return;
 
     onSend(draft, false);
     setDraft("");
@@ -50,32 +59,44 @@ export const AssistantComposer = ({
     submit();
   };
 
-  const toggleListening = () => {
-    if (speech.isListening) {
-      speech.stop();
+  const toggleRecording = () => {
+    if (recorder.isRecording) {
+      recorder.stop();
       return;
     }
 
+    transcription.reset();
     onListenStart();
-    speech.start();
+    void recorder.start();
   };
 
-  const micLabel = !speech.isSupported
+  const micLabel = !recorder.isSupported
     ? t("micUnsupported")
-    : speech.isListening
+    : recorder.isRecording
       ? t("stopListening")
       : t("startListening");
 
   return (
     <form onSubmit={handleSubmit} className="space-y-2 border-t border-border px-4 py-3">
-      {speech.isListening ? (
-        <p aria-live="polite" className="truncate text-sm text-primary">
-          {speech.interimTranscript || t("listening")}
+      {recorder.isRecording ? (
+        <p aria-live="polite" className="text-sm text-primary">
+          {t("listening")}
         </p>
       ) : null}
-      {speech.error ? (
+      {isTranscribing ? (
+        <p aria-live="polite" className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden />
+          {t("transcribing")}
+        </p>
+      ) : null}
+      {recorder.error ? (
         <p role="alert" className="text-xs text-danger">
-          {t(MIC_ERROR_KEYS[speech.error])}
+          {t(MIC_ERROR_KEYS[recorder.error])}
+        </p>
+      ) : null}
+      {transcription.error ? (
+        <p role="alert" className="text-xs text-danger">
+          {getApiErrorMessage(transcription.error, tCommon("error"))}
         </p>
       ) : null}
 
@@ -92,15 +113,15 @@ export const AssistantComposer = ({
         />
         <Button
           type="button"
-          variant={speech.isListening ? "danger" : "soft"}
+          variant={recorder.isRecording ? "danger" : "soft"}
           size="icon"
-          onClick={toggleListening}
-          disabled={!speech.isSupported || isPending}
+          onClick={toggleRecording}
+          disabled={!recorder.isSupported || isBusy}
           aria-label={micLabel}
           title={micLabel}
-          className={cn("h-10 w-10 shrink-0", speech.isListening && "animate-pulse")}
+          className={cn("h-10 w-10 shrink-0", recorder.isRecording && "animate-pulse")}
         >
-          {speech.isListening ? (
+          {recorder.isRecording ? (
             <Square className="h-4 w-4" aria-hidden />
           ) : (
             <Mic className="h-4 w-4" aria-hidden />
@@ -109,7 +130,7 @@ export const AssistantComposer = ({
         <Button
           type="submit"
           size="icon"
-          disabled={!draft.trim() || isPending}
+          disabled={!draft.trim() || isBusy}
           aria-label={t("send")}
           title={t("send")}
           className="h-10 w-10 shrink-0"

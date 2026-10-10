@@ -517,15 +517,15 @@
   "assistant": {
     "open": "Ask the AI assistant",
     "title": "AI assistant",
-    "subtitle": "Ask about properties, tenants, leases and payments",
+    "subtitle": "Ask in English, Urdu or Roman Urdu",
     "assistantLabel": "Assistant",
     "you": "You",
     "placeholder": "Type a question or tap the mic…",
     "send": "Send",
     "startListening": "Ask by voice",
     "stopListening": "Stop listening",
-    "listening": "Listening…",
-    "micUnsupported": "Voice input isn't available in this browser. Use Chrome or Edge.",
+    "listening": "Listening… just pause when you're done",
+    "micUnsupported": "Voice input needs microphone access, which this browser doesn't offer.",
     "micErrors": {
       "notAllowed": "Microphone access is blocked. Allow it in your browser's site settings, then try again.",
       "noSpeech": "I didn't hear anything. Tap the mic and try again.",
@@ -538,11 +538,14 @@
     "thinking": "Looking that up…",
     "notSent": "Not answered",
     "emptyTitle": "How can I help?",
-    "emptyDescription": "Ask in your own words, or tap the mic and speak. I can read your data but not change it yet.",
+    "emptyDescription": "Type or tap the mic and speak, in English, Urdu or Roman Urdu. I can read your data but not change it yet.",
     "suggestions": {
       "summary": "Give me a summary of this month",
-      "owing": "Which tenants still owe rent?",
+      "owing": "Is mahine kis kis ka kiraya baqi hai?",
       "endingLeases": "Which leases end in the next three months?"
-    }
+    },
+    "transcribing": "Understanding what you said…",
+    "preparingVoice": "Preparing voice reply…",
+    "playReply": "Play this reply aloud"
   }
 }

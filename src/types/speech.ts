@@ -1,46 +1,29 @@
-// Minimal Web Speech API shapes — lib.dom ships the result types but not SpeechRecognition itself
-export interface ISpeechRecognitionEvent extends Event {
-  readonly resultIndex: number;
-  readonly results: SpeechRecognitionResultList;
+export type TAudioRecorderError = "not-allowed" | "no-speech" | "other";
+
+export interface IRecordedAudio {
+  base64: string;
+  mimeType: string;
 }
 
-export interface ISpeechRecognitionErrorEvent extends Event {
-  readonly error: string;
+export interface IUseAudioRecorderOptions {
+  onRecorded: (audio: IRecordedAudio) => void;
 }
 
-export interface ISpeechRecognition extends EventTarget {
-  lang: string;
-  continuous: boolean;
-  interimResults: boolean;
-  onresult: ((event: ISpeechRecognitionEvent) => void) | null;
-  onerror: ((event: ISpeechRecognitionErrorEvent) => void) | null;
-  onend: (() => void) | null;
-  start: () => void;
-  stop: () => void;
-  abort: () => void;
-}
-
-export type TSpeechRecognitionConstructor = new () => ISpeechRecognition;
-
-export interface ISpeechWindow {
-  SpeechRecognition?: TSpeechRecognitionConstructor;
-  webkitSpeechRecognition?: TSpeechRecognitionConstructor;
-}
-
-export type TSpeechRecognitionError = "not-allowed" | "no-speech" | "other";
-
-export interface IUseSpeechRecognitionOptions {
-  lang: string;
-  onResult: (transcript: string) => void;
-}
-
-export interface IUseSpeechRecognitionResult {
+export interface IUseAudioRecorderResult {
   isSupported: boolean;
-  isListening: boolean;
-  interimTranscript: string;
-  error: TSpeechRecognitionError | null;
-  start: () => void;
+  isRecording: boolean;
+  error: TAudioRecorderError | null;
+  start: () => Promise<void>;
   stop: () => void;
+}
+
+export interface IRecorderSession {
+  stream: MediaStream;
+  context: AudioContext;
+  chunks: Float32Array[];
+  elapsedSamples: number;
+  lastLoudSample: number;
+  hasSpeech: boolean;
 }
 
 export interface IUseSpeechSynthesisResult {
