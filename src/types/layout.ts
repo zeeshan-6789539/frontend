@@ -17,3 +17,7 @@ export interface IRequireRoleProps {
   children: ReactNode;
   fallback?: ReactNode;
 }
+
+export interface IDealerOnlyProps {
+  children: ReactNode;
+}

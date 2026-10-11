@@ -1,7 +1,7 @@
 import type {
   ButtonHTMLAttributes,
+  ComponentPropsWithRef,
   HTMLAttributes,
-  InputHTMLAttributes,
   ReactNode,
   TextareaHTMLAttributes,
 } from "react";
@@ -26,7 +26,8 @@ export interface ICardProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
 }
 
-export interface IInputProps extends InputHTMLAttributes<HTMLInputElement> {
+// ComponentPropsWithRef so callers can pass a ref straight through (React 19)
+export interface IInputProps extends ComponentPropsWithRef<"input"> {
   hasError?: boolean;
   trailing?: ReactNode;
 }
@@ -50,6 +51,17 @@ export interface ISelectProps {
   disabled?: boolean;
   className?: string;
   "aria-label"?: string;
+}
+
+export interface IMultiSelectProps {
+  id?: string;
+  options: readonly ISelectOption[];
+  values: readonly string[];
+  onChange: (values: string[]) => void;
+  placeholder?: string;
+  hasError?: boolean;
+  disabled?: boolean;
+  className?: string;
 }
 
 export interface IFormFieldProps {
@@ -102,6 +114,21 @@ export interface IStatCardProps {
   value: string;
   hint?: string;
   icon?: ReactNode;
+}
+
+export interface IStackedBarSegment {
+  key: string;
+  label: string;
+  value: number;
+  // Tailwind fill-* class for the bar and bg-* class for the legend dot
+  fillClassName: string;
+  dotClassName: string;
+}
+
+export interface IStackedBarProps {
+  segments: readonly IStackedBarSegment[];
+  label: string;
+  className?: string;
 }
 
 export interface IDatePickerProps {

@@ -1,4 +1,8 @@
-import type { IApiEnvelope, IApiError } from "@/types/api";
+import type { IApiEnvelope, IApiError, IPaginatedResult } from "@/types/api";
+
+// Lets a limit=1 list request double as a counter
+export const getTotalItems = <TItem>(result: IPaginatedResult<TItem> | undefined): number =>
+  result?.meta.totalItems ?? 0;
 
 export const isApiEnvelope = <TData>(
   payload: unknown,

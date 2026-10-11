@@ -13,8 +13,6 @@ import { Link } from "@/i18n/navigation";
 import { RECENT_ITEMS_LIMIT } from "@/config/pagination";
 import { getApiErrorMessage } from "@/utils/api";
 import { formatDate, formatNumber } from "@/utils/format";
-import { DatePicker } from "@/components/ui/date-picker";
-import { DateTimePicker } from "@/components/ui/date-time-picker";
 
 export const DashboardOverview = () => {
   const t = useTranslations("dashboard");

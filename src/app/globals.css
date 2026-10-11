@@ -2,37 +2,45 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Light theme: warm ember brand over a soft, slightly warm neutral canvas */
+/* Light theme: deep teal brand with antique gold over a cool slate canvas */
 :root {
   color-scheme: light;
 
-  --background: oklch(0.985 0.005 85);
-  --background-subtle: oklch(0.963 0.008 82);
-  --foreground: oklch(0.22 0.014 58);
+  --bg-surface: #C8D1D9;
+  --card-surface: #FFFFFF;
+  --text-primary: #061519;
+  --text-secondary: #4A5568;
+  --brand-primary: #006666;
+  --brand-secondary: #B5A36A;
+  --border-color: #A0AEC0;
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.014 58);
-  --card-muted: oklch(0.978 0.005 85);
+  --background: var(--bg-surface);
+  --background-subtle: color-mix(in oklab, var(--bg-surface) 92%, var(--text-primary));
+  --foreground: var(--text-primary);
 
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.014 58);
+  --card: var(--card-surface);
+  --card-foreground: var(--text-primary);
+  --card-muted: color-mix(in oklab, var(--card-surface) 75%, var(--bg-surface));
 
-  --muted: oklch(0.961 0.007 82);
-  --muted-foreground: oklch(0.512 0.016 70);
+  --popover: var(--card-surface);
+  --popover-foreground: var(--text-primary);
 
-  --primary: oklch(0.575 0.193 35);
-  --primary-foreground: oklch(0.995 0.005 85);
-  --primary-hover: oklch(0.512 0.176 33);
-  --primary-soft: oklch(0.955 0.033 58);
-  --primary-soft-foreground: oklch(0.435 0.152 35);
+  --muted: color-mix(in oklab, var(--card-surface) 55%, var(--bg-surface));
+  --muted-foreground: var(--text-secondary);
 
-  --secondary: oklch(0.515 0.098 212);
-  --secondary-foreground: oklch(0.99 0.005 212);
-  --secondary-soft: oklch(0.953 0.026 212);
-  --secondary-soft-foreground: oklch(0.402 0.082 215);
+  --primary: var(--brand-primary);
+  --primary-foreground: var(--card-surface);
+  --primary-hover: color-mix(in oklab, var(--brand-primary) 82%, var(--text-primary));
+  --primary-soft: color-mix(in oklab, var(--brand-primary) 12%, var(--card-surface));
+  --primary-soft-foreground: color-mix(in oklab, var(--brand-primary) 75%, var(--text-primary));
 
-  --accent: oklch(0.955 0.033 58);
-  --accent-foreground: oklch(0.34 0.095 42);
+  --secondary: var(--brand-secondary);
+  --secondary-foreground: var(--text-primary);
+  --secondary-soft: color-mix(in oklab, var(--brand-secondary) 18%, var(--card-surface));
+  --secondary-soft-foreground: color-mix(in oklab, var(--brand-secondary) 50%, var(--text-primary));
+
+  --accent: var(--primary-soft);
+  --accent-foreground: var(--primary-soft-foreground);
 
   --success: oklch(0.545 0.128 152);
   --success-foreground: oklch(0.99 0.005 152);
@@ -54,11 +62,11 @@
   --info-soft: oklch(0.955 0.028 252);
   --info-soft-foreground: oklch(0.438 0.128 252);
 
-  --border: oklch(0.912 0.008 82);
-  --border-strong: oklch(0.858 0.011 80);
-  --input: oklch(0.928 0.008 82);
-  --ring: oklch(0.575 0.193 35);
-  --overlay: oklch(0.22 0.014 58 / 0.44);
+  --border: var(--border-color);
+  --border-strong: color-mix(in oklab, var(--border-color) 80%, var(--text-primary));
+  --input: var(--border-color);
+  --ring: var(--brand-primary);
+  --overlay: color-mix(in oklab, var(--text-primary) 44%, transparent);
 
   --chart-1: oklch(0.612 0.189 38);
   --chart-2: oklch(0.582 0.108 205);
@@ -66,46 +74,54 @@
   --chart-4: oklch(0.552 0.152 296);
   --chart-5: oklch(0.598 0.125 158);
 
-  --shadow-color: 28 22% 32%;
+  --shadow-color: 193 40% 14%;
   --elevation-sm: 0 1px 2px hsl(var(--shadow-color) / 0.06);
   --elevation-md:
     0 1px 2px hsl(var(--shadow-color) / 0.05), 0 6px 16px -6px hsl(var(--shadow-color) / 0.12);
   --elevation-lg:
     0 2px 4px hsl(var(--shadow-color) / 0.05), 0 16px 36px -12px hsl(var(--shadow-color) / 0.18);
-  --elevation-brand: 0 8px 22px -10px oklch(0.575 0.193 35 / 0.55);
+  --elevation-brand: 0 8px 22px -10px color-mix(in oklab, var(--brand-primary) 55%, transparent);
 }
 
-/* Dark theme: same brand hue, lifted for contrast on a deep warm charcoal */
+/* Dark theme: almond brand over a deep teal-black canvas */
 .dark {
   color-scheme: dark;
 
-  --background: oklch(0.158 0.011 62);
-  --background-subtle: oklch(0.135 0.01 62);
-  --foreground: oklch(0.955 0.006 85);
+  --bg-surface: #061519;
+  --card-surface: #0B3037;
+  --text-primary: #F7FAFC;
+  --text-secondary: #A0AEC0;
+  --brand-primary: #FFEBCD;
+  --brand-secondary: #0B3037;
+  --border-color: #1A363D;
 
-  --card: oklch(0.198 0.013 62);
-  --card-foreground: oklch(0.955 0.006 85);
-  --card-muted: oklch(0.225 0.014 62);
+  --background: var(--bg-surface);
+  --background-subtle: color-mix(in oklab, var(--bg-surface) 85%, black);
+  --foreground: var(--text-primary);
 
-  --popover: oklch(0.212 0.014 62);
-  --popover-foreground: oklch(0.955 0.006 85);
+  --card: var(--card-surface);
+  --card-foreground: var(--text-primary);
+  --card-muted: color-mix(in oklab, var(--card-surface) 88%, var(--text-primary));
 
-  --muted: oklch(0.248 0.015 62);
-  --muted-foreground: oklch(0.722 0.018 76);
+  --popover: color-mix(in oklab, var(--card-surface) 94%, var(--text-primary));
+  --popover-foreground: var(--text-primary);
 
-  --primary: oklch(0.702 0.175 42);
-  --primary-foreground: oklch(0.192 0.032 42);
-  --primary-hover: oklch(0.758 0.158 46);
-  --primary-soft: oklch(0.302 0.058 40);
-  --primary-soft-foreground: oklch(0.845 0.108 55);
+  --muted: color-mix(in oklab, var(--card-surface) 85%, var(--text-primary));
+  --muted-foreground: var(--text-secondary);
 
-  --secondary: oklch(0.688 0.105 205);
-  --secondary-foreground: oklch(0.182 0.03 212);
-  --secondary-soft: oklch(0.292 0.048 208);
-  --secondary-soft-foreground: oklch(0.832 0.072 205);
+  --primary: var(--brand-primary);
+  --primary-foreground: var(--bg-surface);
+  --primary-hover: color-mix(in oklab, var(--brand-primary) 88%, var(--bg-surface));
+  --primary-soft: color-mix(in oklab, var(--brand-primary) 14%, var(--card-surface));
+  --primary-soft-foreground: var(--brand-primary);
 
-  --accent: oklch(0.302 0.058 40);
-  --accent-foreground: oklch(0.925 0.058 60);
+  --secondary: var(--brand-secondary);
+  --secondary-foreground: var(--text-primary);
+  --secondary-soft: color-mix(in oklab, var(--brand-secondary) 85%, var(--text-primary));
+  --secondary-soft-foreground: var(--text-primary);
+
+  --accent: var(--primary-soft);
+  --accent-foreground: var(--primary-soft-foreground);
 
   --success: oklch(0.708 0.135 155);
   --success-foreground: oklch(0.182 0.03 155);
@@ -127,11 +143,11 @@
   --info-soft: oklch(0.292 0.055 252);
   --info-soft-foreground: oklch(0.845 0.082 252);
 
-  --border: oklch(0.292 0.013 62);
-  --border-strong: oklch(0.368 0.016 62);
-  --input: oklch(0.312 0.014 62);
-  --ring: oklch(0.702 0.175 42);
-  --overlay: oklch(0.105 0.008 62 / 0.62);
+  --border: var(--border-color);
+  --border-strong: color-mix(in oklab, var(--border-color) 80%, var(--text-primary));
+  --input: var(--border-color);
+  --ring: var(--brand-primary);
+  --overlay: color-mix(in oklab, var(--bg-surface) 70%, transparent);
 
   --chart-1: oklch(0.712 0.172 44);
   --chart-2: oklch(0.708 0.102 202);
@@ -139,13 +155,13 @@
   --chart-4: oklch(0.698 0.138 296);
   --chart-5: oklch(0.725 0.118 158);
 
-  --shadow-color: 24 30% 4%;
+  --shadow-color: 193 62% 3%;
   --elevation-sm: 0 1px 2px hsl(var(--shadow-color) / 0.4);
   --elevation-md:
     0 1px 2px hsl(var(--shadow-color) / 0.34), 0 6px 16px -6px hsl(var(--shadow-color) / 0.55);
   --elevation-lg:
     0 2px 4px hsl(var(--shadow-color) / 0.34), 0 16px 36px -12px hsl(var(--shadow-color) / 0.68);
-  --elevation-brand: 0 8px 22px -10px oklch(0.702 0.175 42 / 0.45);
+  --elevation-brand: 0 8px 22px -10px color-mix(in oklab, var(--brand-primary) 30%, transparent);
 }
 
 @theme inline {
