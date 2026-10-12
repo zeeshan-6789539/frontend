@@ -13,6 +13,11 @@ export const REQUIREMENT_PURPOSES = ["buy", "rent"] as const;
 
 export const REQUIREMENT_STATUSES = ["open", "matched", "closed"] as const;
 
+// Mirrors the backend: each lower level ignores facilities, then area, then budget, then type and city
+export const MATCH_LEVELS = [100, 75, 50, 25, 0] as const;
+
+export const DEFAULT_MATCH_LEVEL = 75;
+
 // Mirrors the backend rule: a sale ends as sold, a rental as rented
 export const CLOSING_STATUS_BY_PURPOSE: Record<TPropertyPurpose, TPropertyStatus> = {
   sale: "sold",

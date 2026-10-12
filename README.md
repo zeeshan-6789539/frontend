@@ -121,7 +121,8 @@ dealer's own company, so the screens never pass a company id.
 - **Requirements** — what a walk-in client wants (buy or rent, type, budget, a preferred
   city with any number of its areas in a multi-select, facilities), with an `open` / `matched` / `closed` status. **Matches** opens
   the active, available listings that fit, from `GET /property-requirements/:id/matches`;
-  a listing must have every facility the requirement asks for. **Choose** on a match marks
+  a listing must have every facility the requirement asks for. A **Match level** slider (0 / 25 / 50 / 75 / 100%)
+  relaxes this by ignoring facilities, then area, then budget, then type and city. **Choose** on a match marks
   that listing sold or rented and the requirement matched, via
   `PATCH /property-requirements/:id/match`. The full flow, from page
   load to matching and closing, is in [docs/requirements-flow.md](docs/requirements-flow.md).

@@ -18,6 +18,7 @@ export const Modal = ({
   isOpen,
   title,
   description,
+  headerContent,
   size = "md",
   onClose,
   children,
@@ -62,25 +63,30 @@ export const Modal = ({
           sizeClasses[size],
         )}
       >
-        <div className="flex items-start gap-4 border-b border-border px-5 py-4">
-          <div className="min-w-0 space-y-1">
-            <h2 id="modal-title" className="text-lg font-semibold tracking-tight">
-              {title}
-            </h2>
-            {description ? (
-              <p className="text-sm text-muted-foreground">{description}</p>
-            ) : null}
+        <div className="border-b border-border px-5 py-4">
+          <div className="flex items-start gap-4">
+            <div className="min-w-0 space-y-1">
+              <h2 id="modal-title" className="text-lg font-semibold tracking-tight">
+                {title}
+              </h2>
+              {description ? (
+                <p className="text-sm text-muted-foreground">{description}</p>
+              ) : null}
+            </div>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              aria-label={t("close")}
+              className="ms-auto shrink-0"
+            >
+              <X className="h-4 w-4" aria-hidden />
+            </Button>
           </div>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            aria-label={t("close")}
-            className="ms-auto shrink-0"
-          >
-            <X className="h-4 w-4" aria-hidden />
-          </Button>
+          {/* Full width, below the title row, so it can span under the close button */}
+          {headerContent ? <div className="pt-2">{headerContent}</div> : null}
         </div>
 
         <div className="max-h-[70dvh] overflow-y-auto px-5 py-4">{children}</div>

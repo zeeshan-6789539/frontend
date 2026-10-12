@@ -1,4 +1,5 @@
 import type {
+  MATCH_LEVELS,
   PROPERTY_PURPOSES,
   PROPERTY_STATUSES,
   REQUIREMENT_PURPOSES,
@@ -10,6 +11,7 @@ export type TPropertyPurpose = (typeof PROPERTY_PURPOSES)[number];
 export type TPropertyStatus = (typeof PROPERTY_STATUSES)[number];
 export type TRequirementPurpose = (typeof REQUIREMENT_PURPOSES)[number];
 export type TRequirementStatus = (typeof REQUIREMENT_STATUSES)[number];
+export type TMatchLevel = (typeof MATCH_LEVELS)[number];
 
 export interface IProperty {
   id: string;

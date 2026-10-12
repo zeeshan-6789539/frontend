@@ -41,6 +41,16 @@ export interface ISelectOption {
   label: string;
 }
 
+export interface IStepSliderProps {
+  id?: string;
+  options: readonly ISelectOption[];
+  value: string;
+  onChange: (value: string) => void;
+  disabled?: boolean;
+  className?: string;
+  "aria-label"?: string;
+}
+
 export interface ISelectProps {
   id?: string;
   options: readonly ISelectOption[];

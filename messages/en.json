@@ -565,9 +565,16 @@
     "matches": "Matches",
     "showMatches": "Show properties that fit this requirement",
     "matchesTitle": "Matches for {name}",
-    "matchesSubtitle": "Active, available listings that fit the purpose, type, budget, location and facilities.",
     "noMatchesTitle": "No matching properties",
-    "noMatchesSubtitle": "Nothing fits yet. Try widening the budget or location, or add a new listing.",
+    "noMatchesSubtitle": "Nothing fits yet. Try a lower match level, widen the budget or location, or add a new listing.",
+    "matchLevel": "Match level",
+    "matchLevels": {
+      "100": "Every detail",
+      "75": "Ignores facilities",
+      "50": "Ignores facilities and area",
+      "25": "Ignores facilities, area and budget",
+      "0": "Rent or buy only"
+    },
     "choose": "Choose",
     "backToMatches": "Back to matches",
     "confirmChoice": "Mark as {status}",

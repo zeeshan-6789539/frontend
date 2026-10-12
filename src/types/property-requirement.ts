@@ -1,6 +1,6 @@
 import type { IAreaSummary } from "@/types/area";
 import type { IFacilitySummary } from "@/types/facility";
-import type { TRequirementPurpose, TRequirementStatus } from "@/types/property";
+import type { TMatchLevel, TRequirementPurpose, TRequirementStatus } from "@/types/property";
 
 export interface IPropertyRequirement {
   id: string;
@@ -39,6 +39,7 @@ export interface IPropertyRequirementQueryParams {
 export interface IRequirementMatchQueryParams {
   page: number;
   limit: number;
+  matchLevel: TMatchLevel;
 }
 
 // null clears an optional column on update

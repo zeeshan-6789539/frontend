@@ -203,10 +203,20 @@ Changing it here only changes the label. No listing is touched; to close a listi
 Click **Matches** on any row. A dialog titled *Matches for {client}* opens and calls:
 
 ```http
-GET /api/v1/property-requirements/:id/matches?page=1&limit=10
+GET /api/v1/property-requirements/:id/matches?page=1&limit=10&matchLevel=75
 ```
 
-**A listing is a match when all of these hold** (empty requirement fields are ignored):
+A **Match level** slider under the dialog title (0% on the left, 100% on the right) relaxes the rules below. Drag it or click a percentage; changing it returns to page 1. It is hidden on the confirm step.
+
+| Match level | Checks applied |
+| --- | --- |
+| 100% | Everything in the table below |
+| 75% (default) | Everything except facilities |
+| 50% | Also ignores area |
+| 25% | Also ignores budget |
+| 0% | Also ignores type and city — only purpose, active and available |
+
+**At 100%, a listing is a match when all of these hold** (empty requirement fields are ignored):
 
 | Requirement field | Listing must… |
 | --- | --- |

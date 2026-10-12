@@ -6,6 +6,8 @@ export interface IModalProps {
   isOpen: boolean;
   title: string;
   description?: string;
+  // Rendered under the title, e.g. a control that shapes the dialog's content
+  headerContent?: ReactNode;
   size?: TModalSize;
   onClose: () => void;
   children: ReactNode;
