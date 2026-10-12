@@ -93,7 +93,8 @@
   --text-secondary: #A0AEC0;
   --brand-primary: #FFEBCD;
   --brand-secondary: #0B3037;
-  --border-color: #1A363D;
+  --border-color: #2A4A52;
+  --input-border-color: #4F7A84;
 
   --background: var(--bg-surface);
   --background-subtle: color-mix(in oklab, var(--bg-surface) 85%, black);
@@ -145,7 +146,7 @@
 
   --border: var(--border-color);
   --border-strong: color-mix(in oklab, var(--border-color) 80%, var(--text-primary));
-  --input: var(--border-color);
+  --input: var(--input-border-color);
   --ring: var(--brand-primary);
   --overlay: color-mix(in oklab, var(--bg-surface) 70%, transparent);
 
