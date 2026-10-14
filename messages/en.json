@@ -41,7 +41,8 @@
     "contacts": "Contacts",
     "propertyTypes": "Property types",
     "facilities": "Facilities",
-    "locations": "Cities & areas"
+    "locations": "Cities & areas",
+    "assistant": "Voice assistant"
   },
   "sidebar": {
     "open": "Open menu",
@@ -626,5 +627,70 @@
     "selectCityFirst": "Choose a city first",
     "areasHint": "A listing in any one of these areas matches. Leave empty for the whole city.",
     "areasNeedCityHint": "Pick a preferred city to choose its areas."
+  },
+  "assistant": {
+    "title": "Voice assistant",
+    "subtitle": "Talk to Gemini to add properties, contacts and requirements, search your records or move around the app.",
+    "start": "Start talking",
+    "stop": "End",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "openPanel": "Open the voice assistant",
+    "openFull": "Open the full assistant page",
+    "minimize": "Minimise",
+    "you": "You",
+    "assistantName": "Gemini",
+    "send": "Send",
+    "composerPlaceholder": "Type a message…",
+    "composerInactive": "Start the assistant to type or talk",
+    "transcriptEmptySubtitle": "Tap the voice button below and say something like “I want to add a property”.",
+    "searchResultsTitle": "{count, plural, =0 {No matching records} one {# matching record} other {# matching records}}",
+    "noResults": "No records matched.",
+    "openList": "Open the full list",
+    "saved": "\"{name}\" saved.",
+    "status": {
+      "idle": "Ready when you are",
+      "connecting": "Connecting…",
+      "listening": "Listening…",
+      "speaking": "Speaking…",
+      "thinking": "Working on it…"
+    },
+    "errors": {
+      "micDenied": "Microphone access was blocked. Allow it in your browser's site settings, then try again.",
+      "micMissing": "No microphone was found. Connect one, then try again.",
+      "connect": "Could not start the voice session. Please try again.",
+      "connection": "The connection to Gemini had a problem.",
+      "closed": "The voice session ended. Press Start talking to continue.",
+      "closedWithReason": "The voice session ended: {reason}"
+    },
+    "forms": {
+      "property": "New property",
+      "requirement": "New requirement",
+      "contact": "New contact",
+      "city": "New city",
+      "area": "New area",
+      "propertyType": "New property type",
+      "facility": "New facility"
+    },
+    "form": {
+      "progress": "{filled} of {total} required",
+      "askingNow": "Gemini is asking about this — speak, type or pick.",
+      "askAbout": "Ask about this",
+      "filled": "Filled — change",
+      "choose": "Choose…",
+      "chooseMany": "Choose one or more…",
+      "chooseParentFirst": "Choose the city first",
+      "allRequiredDone": "All required details are in. Add optional ones by voice, or review.",
+      "nestedFor": "Creating it for the {form} form",
+      "review": "Review",
+      "reviewSubtitle": "Check the details, then save — or just say “yes, save it”.",
+      "keepEditing": "Keep editing"
+    },
+    "suggestions": {
+      "property": "I want to add a property",
+      "contact": "Add a new customer",
+      "requirement": "Add a client requirement",
+      "search": "Find available properties"
+    }
   }
 }

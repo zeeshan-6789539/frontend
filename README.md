@@ -51,7 +51,8 @@ src/
 │   │       ├── contacts/    # Dealer owners and seekers
 │   │       ├── locations/   # Dealer cities and their areas
 │   │       ├── property-types/ # Dealer property types
-│   │       └── facilities/  # Dealer facilities (bedrooms, attached bath, furnished…)
+│   │       ├── facilities/  # Dealer facilities (bedrooms, attached bath, furnished…)
+│   │       └── assistant/   # Full-page Gemini voice assistant
 │   └── globals.css          # Theme tokens + base layer
 ├── components/
 │   ├── layout/              # Sidebar, nav, user menu, role guard, switchers
@@ -68,7 +69,8 @@ src/
 │   ├── properties/
 │   ├── property-requirements/
 │   ├── property-types/
-│   └── users/
+│   ├── users/
+│   └── voice-assistant/     # Gemini Live session, audio, voice-guided forms (see below)
 │       ├── api/             # Client fetchers + query keys
 │       ├── components/      # View, table, form dialog
 │       ├── hooks/           # useQuery / useMutation wrappers
@@ -145,6 +147,52 @@ deals, contacts), listing inventory by status and purpose, the requirements pipe
 match rate, and the newest listings and requirements. Like the super admin counters, every figure
 comes from the existing list endpoints with `limit=1`, aggregated in
 [`useDealerStats`](src/features/dashboard/hooks/use-dealer-stats.ts).
+
+## Voice assistant
+
+**Voice assistant** in the sidebar (`/assistant`, super admin and client admin) is a full-page conversation with
+Gemini. On every other dashboard page, a floating orb in the bottom corner opens a compact panel connected to
+the same session, so the user can talk from anywhere. Both are in
+[src/features/voice-assistant/](src/features/voice-assistant/).
+
+How a session works:
+
+1. The voice button in the one-line bar at the bottom (Gemini Live style: type or talk, mute, and a red
+   button to end) calls `POST /assistant/session`, which returns a single-use Gemini token. The Google
+   key stays on the backend.
+2. The browser connects to Gemini Live directly. The mic is captured with an AudioWorklet
+   ([public/worklets/pcm-capture-processor.js](public/worklets/pcm-capture-processor.js)) and sent as
+   16 kHz PCM. Replies come back as 24 kHz audio plus live transcripts, and the user can interrupt.
+3. Gemini acts through **tools** that run in the browser with the existing API fetchers, so the
+   backend's role and company rules apply as usual:
+   - `navigate`, for any sidebar page the role can see;
+   - `searchRecords`, over properties, requirements and contacts;
+   - form tools for client admins only: `startForm`, `fillFields`, `getFieldOptions`, `focusField`,
+     `startNestedForm`, `reviewForm`, `submitForm`, `cancelForm`.
+
+**Voice-guided forms.** Saying "I want to add a property" opens a form card with the right control for each
+field: text box, dropdown or multi-select. Gemini asks for one field at a time, required fields first, then
+asks once about optional fields.
+
+- **How fields are defined.** Each form is a config in
+  [forms/](src/features/voice-assistant/forms/) (property, requirement, contact, city, area, property type,
+  facility). A config lists the fields, where dropdown options come from, any field dependencies (area
+  depends on city) and the existing Zod schema that validates it. Adding a voice form means adding one
+  config file.
+- **Several answers at once.** If the user gives several details in one sentence, they are filled together.
+- **Dropdowns.** A spoken option ("DHA", "Lahore") is matched to the real option by
+  [utils/fuzzy-match.ts](src/utils/fuzzy-match.ts). When more than one option fits, Gemini asks which one.
+- **Amounts.** Phrases like "2 crore 50 lakh", "85k" or "85 hazar" become whole rupees through
+  [utils/spoken-number.ts](src/utils/spoken-number.ts).
+- **Missing owner or client.** When the contact doesn't exist yet, `startNestedForm` opens a contact form.
+  Once it's saved, the parent form continues with the new contact selected.
+- **Typing and clicking.** The user can also type or pick values on screen. Gemini gets a `[screen]` note
+  for each change, and a typed amount is cleaned up the same way as a spoken one.
+- **Saving.** Nothing is saved until the review card is shown and the user confirms, by voice or with
+  **Save**. After a save, the affected TanStack Query lists refresh.
+
+The assistant replies in the language the user speaks, and defaults to the app's locale (English or Urdu).
+Voice edit and delete are not supported yet; use the regular screens for those.
 
 ## Language switching
 

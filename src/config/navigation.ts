@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   ListChecks,
   MapPinned,
+  Sparkles,
   Tags,
   Users,
 } from "lucide-react";
@@ -13,6 +14,12 @@ import type { INavItem } from "@/types/navigation";
 
 export const navItems: readonly INavItem[] = [
   { href: "/", labelKey: "dashboard", icon: LayoutDashboard },
+  {
+    href: "/assistant",
+    labelKey: "assistant",
+    icon: Sparkles,
+    roles: ["super_admin", "client_admin"],
+  },
   {
     href: "/companies",
     labelKey: "companies",
