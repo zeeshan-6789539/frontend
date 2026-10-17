@@ -31,7 +31,26 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:5000/api/v1
 That URL is the backend host plus its global prefix (`API_PREFIX=api`) and URI version
 (`API_VERSION=1`). The backend must allow `http://localhost:5001` in its `CORS_ORIGINS`.
 
-Scripts: `dev`, `build`, `start`, `lint`, `typecheck`.
+### Environment variables
+
+All are optional; the defaults live in [src/config/site.ts](src/config/site.ts). `NEXT_PUBLIC_*`
+values are inlined at build time, so restart `pnpm dev` or rebuild after changing them.
+
+| Variable                        | Default                         | Purpose                                     |
+| ------------------------------- | ------------------------------- | ------------------------------------------- |
+| `NEXT_PUBLIC_API_BASE_URL`      | `http://localhost:5000/api/v1`  | Backend host + prefix + version             |
+| `NEXT_PUBLIC_COMPANY_NAME`      | `Restaurant Management System`  | Full company name, used as the site description |
+| `NEXT_PUBLIC_COMPANY_SHOT_NAME` | `RMS`                           | Short company name, used as the site name   |
+
+### Scripts
+
+| Script           | What it does                         |
+| ---------------- | ------------------------------------ |
+| `pnpm dev`       | Dev server on :5001 (Turbopack)      |
+| `pnpm build`     | Production build                     |
+| `pnpm start`     | Serve the production build on :5001  |
+| `pnpm lint`      | ESLint                               |
+| `pnpm typecheck` | `tsc --noEmit`                       |
 
 ## Folder structure
 
