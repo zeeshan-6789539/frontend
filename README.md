@@ -65,7 +65,8 @@ src/
 │   │       ├── page.tsx     # Dashboard overview
 │   │       ├── companies/   # Company administration
 │   │       └── users/       # User administration
-│   └── globals.css          # Theme tokens + base layer
+│   ├── globals.css          # Theme tokens + base layer
+│   └── icon.svg             # Browser tab icon (MIFA "M" monogram)
 ├── components/
 │   ├── layout/              # Sidebar, nav, user menu, role guard, switchers
 │   ├── providers/           # Theme, TanStack Query, toast providers
