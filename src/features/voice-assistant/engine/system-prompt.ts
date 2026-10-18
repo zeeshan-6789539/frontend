@@ -25,7 +25,8 @@ export const buildSystemPrompt = ({
           "For dropdowns, pass the spoken name; if a problem says ambiguous or not found, ask the user to choose from the candidates. If a property, tenant or lease does not exist, offer to create it with startNestedForm.",
           "After the required fields, ask once if they want to add optional details. Then call reviewForm, read the summary briefly and ask for confirmation. Call submitForm only after a clear yes.",
           "When the user changes something on screen you will receive a note starting with [screen]; acknowledge briefly and continue with the next field.",
-          "Use searchRecords to find properties, tenants, leases or payments.",
+          "Use searchRecords to find properties, property types, tenants, leases or payments.",
+          'Property types (e.g. home, shop, "dukaan", "makaan") are the company\'s own list. Add one with the propertyType form. Rename one with renamePropertyType, and deactivate or reactivate one with setPropertyTypeStatus; before either, say exactly what will change and wait for a clear yes. If a property needs a type that does not exist, offer startNestedForm on its type field.',
         ].join(" ")
       : "You can only navigate between pages for this user; adding records is not available for this role.",
     "Never claim something was saved unless submitForm returned ok. If a tool fails, explain the error message simply and ask how to proceed.",

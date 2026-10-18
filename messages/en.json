@@ -35,6 +35,7 @@
     "companies": "Companies",
     "users": "Users",
     "properties": "Properties",
+    "propertyTypes": "Property Types",
     "tenants": "Tenants",
     "leases": "Leases",
     "payments": "Payments",
@@ -266,7 +267,7 @@
     "restored": "Property \"{name}\" reactivated.",
     "emptyTitle": "No properties found",
     "emptySubtitle": "Adjust your filters, or add the first property.",
-    "searchPlaceholder": "Search number, name, city…",
+    "searchPlaceholder": "Search number, name, city, type…",
     "fields": {
       "propertyNumber": "Property no.",
       "name": "Name",
@@ -285,17 +286,41 @@
       "propertyTypeInvalid": "Choose a property type.",
       "rentDueDayRange": "Rent due day must be between 1 and 28."
     },
-    "rentDueDayOption": "Day {day}"
+    "rentDueDayOption": "Day {day}",
+    "propertyTypePlaceholder": "Select a type",
+    "noPropertyTypes": "Your company has no active property types. Add one under Property Types first."
   },
   "propertyTypes": {
-    "home": "Home",
-    "apartment": "Apartment",
-    "room": "Room",
-    "shop": "Shop",
-    "office": "Office",
-    "warehouse": "Warehouse",
-    "land": "Land",
-    "other": "Other"
+    "title": "Property types",
+    "subtitle": "The types you can pick when adding a property.",
+    "create": "New type",
+    "createTitle": "New property type",
+    "createSubtitle": "Add a type to your company's list.",
+    "editTitle": "Edit property type",
+    "editSubtitle": "Rename this type or change its status. Properties already using it show the new name.",
+    "edit": "Edit type",
+    "deactivate": "Deactivate",
+    "restore": "Reactivate",
+    "deactivateTitle": "Deactivate property type",
+    "restoreTitle": "Reactivate property type",
+    "deactivateConfirm": "\"{name}\" will no longer be offered when adding or editing a property. Properties already using it keep it.",
+    "restoreConfirm": "\"{name}\" will be offered in the property form again.",
+    "created": "Property type \"{name}\" created.",
+    "updated": "Property type \"{name}\" updated.",
+    "deactivated": "Property type \"{name}\" deactivated.",
+    "restored": "Property type \"{name}\" reactivated.",
+    "emptyTitle": "No property types found",
+    "emptySubtitle": "Adjust your filters, or add the first type.",
+    "searchPlaceholder": "Search type name…",
+    "inactiveOption": "{name} (deactivated)",
+    "fields": {
+      "name": "Name",
+      "status": "Status",
+      "createdAt": "Created"
+    },
+    "errors": {
+      "nameLength": "Name must be between 2 and 100 characters."
+    }
   },
   "tenants": {
     "title": "Tenants",
@@ -553,6 +578,7 @@
     },
     "forms": {
       "property": "New property",
+      "propertyType": "New property type",
       "tenant": "New tenant",
       "lease": "New lease",
       "payment": "New payment"

@@ -1,7 +1,7 @@
 import type { FunctionDeclaration } from "@google/genai";
 import type { TAssistantFormType } from "@/types/voice-assistant";
 
-const SEARCH_MODULES = ["properties", "tenants", "leases", "payments"] as const;
+const SEARCH_MODULES = ["properties", "propertyTypes", "tenants", "leases", "payments"] as const;
 
 const fieldInputSchema = {
   type: "object",
@@ -32,7 +32,7 @@ export const buildRecordTools = (
   {
     name: "searchRecords",
     description:
-      "Search the company's properties, tenants, leases or payments and show the results on screen. Summarise at most three results aloud.",
+      "Search the company's properties, property types, tenants, leases or payments and show the results on screen. Summarise at most three results aloud.",
     parametersJsonSchema: {
       type: "object",
       properties: {
@@ -104,5 +104,31 @@ export const buildRecordTools = (
     name: "cancelForm",
     description: "Discard the open form when the user wants to stop.",
     parametersJsonSchema: { type: "object", properties: {} },
+  },
+  {
+    name: "renamePropertyType",
+    description:
+      "Rename one of the company's property types. Every property using it shows the new name. Call ONLY after repeating the change and getting a clear yes.",
+    parametersJsonSchema: {
+      type: "object",
+      properties: {
+        name: { type: "string", description: "The type's current name as the user said it." },
+        newName: { type: "string", description: "The new name, 2-100 characters." },
+      },
+      required: ["name", "newName"],
+    },
+  },
+  {
+    name: "setPropertyTypeStatus",
+    description:
+      "Deactivate a property type (hides it from the property form; properties already using it keep it) or reactivate it. Call ONLY after repeating the change and getting a clear yes.",
+    parametersJsonSchema: {
+      type: "object",
+      properties: {
+        name: { type: "string", description: "The type's name as the user said it." },
+        active: { type: "boolean", description: "true to reactivate, false to deactivate." },
+      },
+      required: ["name", "active"],
+    },
   },
 ];

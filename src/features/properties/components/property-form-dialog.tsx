@@ -9,26 +9,23 @@ import { FormGrid } from "@/components/ui/form-grid";
 import { Input } from "@/components/ui/input";
 import { Modal } from "@/components/ui/modal";
 import { Select } from "@/components/ui/select";
-import {
-  DEFAULT_PROPERTY_TYPE,
-  DEFAULT_RENT_DUE_DAY,
-  PROPERTY_TYPES,
-  RENT_DUE_DAYS,
-} from "@/config/property";
+import { DEFAULT_RENT_DUE_DAY, RENT_DUE_DAYS } from "@/config/property";
 import { propertySchema } from "@/features/properties/schemas/property-schema";
 import { useSaveProperty } from "@/features/properties/hooks/use-save-property";
+import { usePropertyTypeOptions } from "@/features/property-types/hooks/use-property-type-options";
 import { useFormState } from "@/hooks/use-form-state";
 import { useToast } from "@/hooks/use-toast";
 import { getApiErrorMessage } from "@/utils/api";
+import { withMissingOptions } from "@/utils/options";
 import { toTranslatedFieldErrors } from "@/utils/zod";
-import type { IProperty, IPropertyFormValues, TPropertyType } from "@/types/property";
+import type { IProperty, IPropertyFormValues } from "@/types/property";
 import type { IPropertyFormDialogProps } from "@/features/properties/types/property-components";
 
 const toFormValues = (property: IProperty | null): IPropertyFormValues => ({
   name: property?.name ?? "",
   addressLine1: property?.addressLine1 ?? "",
   city: property?.city ?? "",
-  propertyType: property?.propertyType ?? DEFAULT_PROPERTY_TYPE,
+  propertyTypeId: property?.propertyTypeId ?? "",
   rentDueDay: property?.rentDueDay ?? DEFAULT_RENT_DUE_DAY,
   status: property?.status ?? true,
 });
@@ -37,7 +34,7 @@ const toPayload = (values: IPropertyFormValues) => ({
   name: values.name.trim(),
   addressLine1: values.addressLine1.trim(),
   city: values.city.trim(),
-  propertyType: values.propertyType,
+  propertyTypeId: values.propertyTypeId,
   rentDueDay: values.rentDueDay,
   status: values.status,
 });
@@ -51,6 +48,7 @@ export const PropertyFormDialog = ({
   const tCommon = useTranslations("common");
   const tTypes = useTranslations("propertyTypes");
   const { showToast } = useToast();
+  const { options: activeTypeOptions, isPending: isTypesPending } = usePropertyTypeOptions(isOpen);
   const { values, errors, setValue, setErrors, reset } = useFormState(
     toFormValues(property),
   );
@@ -68,10 +66,19 @@ export const PropertyFormDialog = ({
     { value: "false", label: tCommon("deactivated") },
   ];
 
-  const propertyTypeOptions = PROPERTY_TYPES.map((type) => ({
-    value: type,
-    label: tTypes(type),
-  }));
+  // A property may keep a type that was deactivated after it was assigned
+  const propertyTypeOptions = withMissingOptions(
+    activeTypeOptions,
+    property
+      ? [
+          {
+            value: property.propertyTypeId,
+            label: tTypes("inactiveOption", { name: property.propertyTypeName }),
+          },
+        ]
+      : [],
+  );
+  const hasNoTypes = !isTypesPending && propertyTypeOptions.length === 0;
 
   const rentDueDayOptions = RENT_DUE_DAYS.map((day) => ({
     value: String(day),
@@ -145,17 +152,19 @@ export const PropertyFormDialog = ({
           </FormField>
 
           <FormField
-            id="propertyType"
+            id="propertyTypeId"
             label={t("fields.propertyType")}
-            error={errors.propertyType}
+            error={errors.propertyTypeId}
+            hint={hasNoTypes ? t("noPropertyTypes") : undefined}
           >
             <Select
-              id="propertyType"
-              value={values.propertyType}
-              onChange={(value) => setValue("propertyType", value as TPropertyType)}
+              id="propertyTypeId"
+              value={values.propertyTypeId}
+              onChange={(value) => setValue("propertyTypeId", value)}
               options={propertyTypeOptions}
-              hasError={Boolean(errors.propertyType)}
-              disabled={isPending}
+              placeholder={t("propertyTypePlaceholder")}
+              hasError={Boolean(errors.propertyTypeId)}
+              disabled={isPending || isTypesPending}
             />
           </FormField>
 

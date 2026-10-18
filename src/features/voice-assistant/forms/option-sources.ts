@@ -1,9 +1,10 @@
 import { MAX_PAGE_SIZE } from "@/config/pagination";
-import { PROPERTY_TYPES } from "@/config/property";
 import { leaseKeys } from "@/features/leases/api/lease-keys";
 import { fetchLeases } from "@/features/leases/api/leases.api";
 import { propertyKeys } from "@/features/properties/api/property-keys";
 import { fetchProperties } from "@/features/properties/api/properties.api";
+import { propertyTypeKeys } from "@/features/property-types/api/property-type-keys";
+import { fetchPropertyTypes } from "@/features/property-types/api/property-types.api";
 import { tenantKeys } from "@/features/tenants/api/tenant-keys";
 import { fetchTenants } from "@/features/tenants/api/tenants.api";
 import { buildLeaseLabel } from "@/utils/lease";
@@ -30,7 +31,17 @@ const withSearch = (search: string | undefined) => (search ? { search } : {});
 
 export const optionSources: Record<TAssistantOptionSource, IAssistantOptionSourceDef> = {
   propertyTypes: {
-    load: async ({ translate }) => toEnumOptions(PROPERTY_TYPES, "propertyTypes", translate),
+    load: async ({ queryClient }) => {
+      const params = { ...FIRST_PAGE, status: true, sortOrder: "asc" as const };
+      const result = await queryClient.fetchQuery({
+        queryKey: propertyTypeKeys.list(params),
+        queryFn: () => fetchPropertyTypes(params),
+      });
+      return result.items.map((propertyType) => ({
+        value: propertyType.id,
+        label: propertyType.name,
+      }));
+    },
   },
   paymentMethods: {
     load: async ({ translate }) => toEnumOptions(PAYMENT_METHODS, "payments.methods", translate),

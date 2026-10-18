@@ -89,6 +89,7 @@ Every route has a locale prefix (`/en/...`, `/ur/...`).
 | `/companies` | Company list, create/edit, deactivate/restore | super_admin | ✓ |
 | `/users` | User list, create/edit, deactivate/restore | super_admin | ✓ |
 | `/properties` | Property list (with `P-0001` numbers), create/edit, deactivate/restore | client_admin | ✓ |
+| `/property-types` | The company's property type list: add, rename, deactivate/restore | client_admin | ✓ |
 | `/tenants` | Tenant list, create/edit, deactivate/restore | client_admin | ✓ |
 | `/leases` | Lease list, create/edit, change status, change rent | client_admin | ✓ |
 | `/leases/[id]` | Lease detail: ledger statement, charges, payments, PDFs | client_admin | via lease list |
@@ -121,7 +122,7 @@ rms-frontend/
     │           ├── layout.tsx   # Sidebar + main area
     │           ├── page.tsx     # DashboardRouter
     │           ├── companies/   users/                     # super_admin
-    │           ├── properties/  tenants/  leases/  leases/[id]/  ledger/  payments/   # client_admin
+    │           ├── properties/  property-types/  tenants/  leases/  leases/[id]/  ledger/  payments/   # client_admin
     │           └── assistant/   # Full-page Gemini voice assistant (client_admin + company flag)
     ├── components/
     │   ├── layout/              # app-sidebar, app-nav, user-menu, require-role, assistant-only, page-heading,
@@ -133,7 +134,7 @@ rms-frontend/
     ├── config/                  # site, auth (cookies/endpoints), roles, navigation, pagination, phone, property, assistant
     ├── features/                # One slice per backend module
     │   ├── auth/  companies/  users/  dashboard/
-    │   ├── properties/  tenants/  leases/  ledger/  payments/
+    │   ├── properties/  property-types/  tenants/  leases/  ledger/  payments/
     │   ├── voice-assistant/     # Gemini Live session, audio, engine, voice-guided forms (see Voice assistant)
     │   └── <feature>/
     │       ├── api/             # <feature>.api.ts fetchers + <feature>-keys.ts query keys
@@ -188,7 +189,8 @@ The forms follow the backend rules: a `super_admin` can't be given a company, a 
 
 ```mermaid
 flowchart LR
-  A[Properties<br/>add unit, rent due day] --> C[Leases<br/>pick property + tenant,<br/>dates, rent, advance, document link]
+  PT[Property Types<br/>company's own list] --> A
+  A[Properties<br/>add unit, type, rent due day] --> C[Leases<br/>pick property + tenant,<br/>dates, rent, advance, document link]
   B[Tenants<br/>add person] --> C
   C --> D[Lease detail]
   D --> E[Add charge<br/>bill / adjustment / advance]
@@ -200,6 +202,7 @@ flowchart LR
 ```
 
 - **Dashboard.** Stat cards (tenants, properties, active leases, this month's payments compared with last month), a payments trend chart (6 months, 1 year or all time), a property status breakdown, recent payments, and the leases with the most outstanding.
+- **Property Types** (`/property-types`). Each company starts with Home, Apartment, Room, Shop, Office, Warehouse, Land and Other, and the admin can add, rename, deactivate or restore types. Only **active** types appear in the property form and the voice assistant. Properties that already use a deactivated type keep it, and the property list can still filter by it.
 - **Lease detail** (`/leases/[id]`) is the main working screen. It shows the lease, its outstanding balance and the full ledger with running balances. It supports search and a period filter (all, current month, last month, last 3 months, last 6 months). From here the admin can add charges, record payments, deactivate or restore entries, change the rent or status, and open the PDFs.
 - **Deactivate, don't delete.** Every destructive action asks for confirmation and only sets `status` to false. A deactivated ledger entry stays on the statement, struck through and faded, and no longer counts towards the balance. Restoring it adds it back.
 - **PDFs** are built in the browser by [invoice-pdf.ts](src/utils/invoice-pdf.ts) and [ledger-pdf.ts](src/utils/ledger-pdf.ts), and open in a new tab. Each has the company name, an `INV-` / `LDG-` document number, the property number, the lease term and a "Powered by" footer.
@@ -248,14 +251,16 @@ How a session works:
 2. The browser connects to Gemini Live directly. The mic is captured with an AudioWorklet ([public/worklets/pcm-capture-processor.js](public/worklets/pcm-capture-processor.js)) and sent as 16 kHz PCM. Replies come back as 24 kHz audio plus live transcripts, and the user can interrupt.
 3. Gemini acts through **tools** that run in the browser with the existing API fetchers, so the backend's role and company rules apply as usual:
    - `navigate`, for any sidebar page the user can see;
-   - `searchRecords`, over properties, tenants, leases and payments;
-   - form tools: `startForm`, `fillFields`, `getFieldOptions`, `focusField`, `startNestedForm`, `reviewForm`, `submitForm`, `cancelForm`.
+   - `searchRecords`, over properties, property types, tenants, leases and payments;
+   - form tools: `startForm`, `fillFields`, `getFieldOptions`, `focusField`, `startNestedForm`, `reviewForm`, `submitForm`, `cancelForm`;
+   - property type tools: `renamePropertyType` and `setPropertyTypeStatus` (deactivate or reactivate). Both find the type by its spoken name (an ambiguous or unknown name returns the candidates), and Gemini must repeat the change and get a clear yes before calling them. They live in [property-type-actions.ts](src/features/voice-assistant/engine/property-type-actions.ts).
 
 **Voice-guided forms.** Saying "I want to add a tenant" opens a form card with the right control for each field: text box, date picker or dropdown. Gemini asks for one field at a time, required fields first, then asks once about optional fields.
 
 | Form | Fields | Saves through |
 | --- | --- | --- |
-| Property | name, type, address, city, rent due day | `createProperty` (`POST /properties`) |
+| Property | name, type (a missing type can be created on the spot), address, city, rent due day | `createProperty` (`POST /properties`) |
+| Property type | name | `createPropertyType` (`POST /property-types`) |
 | Tenant | name, phone, email | `createTenant` (`POST /tenants`) |
 | Lease | property, tenant, start and end date, monthly rent, advance, document link | `createLease` (`POST /leases`) |
 | Payment | active lease, amount, date, method (cash preselected), reference, receipt, bank and cheque clearance date when relevant, notes | `createPayment` (`POST /payments`) |

@@ -22,7 +22,6 @@ export const PropertiesTable = ({
 }: IPropertiesTableProps) => {
   const t = useTranslations("properties");
   const tCommon = useTranslations("common");
-  const tTypes = useTranslations("propertyTypes");
   const locale = useLocale();
 
   return (
@@ -54,7 +53,7 @@ export const PropertiesTable = ({
             </TableCell>
 
             <TableCell className="text-muted-foreground">
-              <p>{tTypes(property.propertyType)}</p>
+              <p>{property.propertyTypeName}</p>
             </TableCell>
 
             <TableCell className="text-muted-foreground">

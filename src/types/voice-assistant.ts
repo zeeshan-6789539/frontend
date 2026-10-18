@@ -5,7 +5,7 @@ import type { TLocale } from "@/types/locale";
 import type { ISelectOption } from "@/types/ui";
 import type { TUserRole } from "@/types/user";
 
-export type TAssistantFormType = "property" | "tenant" | "lease" | "payment";
+export type TAssistantFormType = "property" | "propertyType" | "tenant" | "lease" | "payment";
 
 export type TAssistantFieldKind =
   | "text"
@@ -35,7 +35,12 @@ export type TAssistantStatus = "idle" | "connecting" | "listening" | "speaking" 
 
 export type TAssistantSpeaker = "user" | "assistant" | "system";
 
-export type TAssistantSearchModule = "properties" | "tenants" | "leases" | "payments";
+export type TAssistantSearchModule =
+  | "properties"
+  | "propertyTypes"
+  | "tenants"
+  | "leases"
+  | "payments";
 
 export interface IAssistantOptionContext {
   queryClient: QueryClient;

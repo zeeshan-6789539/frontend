@@ -1,7 +1,4 @@
-import type { PROPERTY_TYPES } from "@/config/property";
 import type { IAssignedEntity } from "@/types/assigned-entity";
-
-export type TPropertyType = (typeof PROPERTY_TYPES)[number];
 
 export interface IProperty {
   id: string;
@@ -10,7 +7,8 @@ export interface IProperty {
   name: string;
   addressLine1: string;
   city: string;
-  propertyType: TPropertyType;
+  propertyTypeId: string;
+  propertyTypeName: string;
   rentDueDay: number;
   status: boolean;
   createdAt: string;
@@ -25,7 +23,7 @@ export interface IPropertyListItem extends IProperty {
 export interface IPropertyFilters {
   search?: string;
   city?: string;
-  propertyType?: TPropertyType;
+  propertyTypeId?: string;
   status?: boolean;
 }
 
@@ -38,7 +36,7 @@ export interface IPropertyPayload {
   name: string;
   addressLine1: string;
   city: string;
-  propertyType: TPropertyType;
+  propertyTypeId: string;
   rentDueDay: number;
   status?: boolean;
 }
@@ -52,7 +50,7 @@ export interface IPropertyFormValues {
   name: string;
   addressLine1: string;
   city: string;
-  propertyType: TPropertyType;
+  propertyTypeId: string;
   rentDueDay: number;
   status: boolean;
 }

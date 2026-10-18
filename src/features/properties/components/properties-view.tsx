@@ -22,22 +22,23 @@ import { useToast } from "@/hooks/use-toast";
 import { getApiErrorMessage } from "@/utils/api";
 import { emptyToUndefined } from "@/utils/string";
 import { toStatusValue } from "@/utils/status";
+import { usePropertyTypeOptions } from "@/features/property-types/hooks/use-property-type-options";
 import { DEFAULT_PAGE_SIZE } from "@/config/pagination";
-import { PROPERTY_TYPES } from "@/config/property";
-import type { IProperty, IPropertyQueryParams, TPropertyType } from "@/types/property";
+import type { IProperty, IPropertyQueryParams } from "@/types/property";
 import type { TStatusFilter } from "@/types/query-params";
 
 export const PropertiesView = () => {
   const t = useTranslations("properties");
   const tCommon = useTranslations("common");
   const tFilters = useTranslations("filters");
-  const tTypes = useTranslations("propertyTypes");
   const { showToast } = useToast();
+  // Deactivated types stay filterable, since properties can still carry them
+  const { options: propertyTypeOptions } = usePropertyTypeOptions(true, false);
 
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<TStatusFilter>("all");
-  const [typeFilter, setTypeFilter] = useState<TPropertyType | "">("");
+  const [typeFilter, setTypeFilter] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProperty, setEditingProperty] = useState<IProperty | null>(null);
   const [statusTarget, setStatusTarget] = useState<IProperty | null>(null);
@@ -56,7 +57,7 @@ export const PropertiesView = () => {
   };
 
   const handleTypeChange = (value: string) => {
-    setTypeFilter(value as TPropertyType | "");
+    setTypeFilter(value);
     setPage(1);
   };
 
@@ -65,7 +66,7 @@ export const PropertiesView = () => {
       page,
       limit: DEFAULT_PAGE_SIZE,
       search: emptyToUndefined(debouncedSearch),
-      propertyType: typeFilter || undefined,
+      propertyTypeId: typeFilter || undefined,
       status: toStatusValue(statusFilter),
     }),
     [page, debouncedSearch, typeFilter, statusFilter],
@@ -82,7 +83,7 @@ export const PropertiesView = () => {
 
   const typeOptions = [
     { value: "", label: tFilters("allPropertyTypes") },
-    ...PROPERTY_TYPES.map((type) => ({ value: type, label: tTypes(type) })),
+    ...propertyTypeOptions,
   ];
 
   const openCreateDialog = () => {

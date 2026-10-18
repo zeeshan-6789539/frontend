@@ -11,6 +11,10 @@ import {
   getFormDef,
   resolveScalar,
 } from "@/features/voice-assistant/engine/form-engine";
+import {
+  renamePropertyType,
+  setPropertyTypeStatus,
+} from "@/features/voice-assistant/engine/property-type-actions";
 import { searchRecords } from "@/features/voice-assistant/engine/search-records";
 import { buildSystemPrompt } from "@/features/voice-assistant/engine/system-prompt";
 import { getEnumArg, getFieldInputs, getStringArg } from "@/features/voice-assistant/engine/tool-args";
@@ -35,7 +39,13 @@ import type {
   TAssistantValue,
 } from "@/types/voice-assistant";
 
-const SEARCH_MODULES: readonly TAssistantSearchModule[] = ["properties", "tenants", "leases", "payments"];
+const SEARCH_MODULES: readonly TAssistantSearchModule[] = [
+  "properties",
+  "propertyTypes",
+  "tenants",
+  "leases",
+  "payments",
+];
 
 export const VoiceAssistantProvider = ({ children }: IAssistantProviderProps) => {
   const t = useTranslations("assistant");
@@ -128,6 +138,23 @@ export const VoiceAssistantProvider = ({ children }: IAssistantProviderProps) =>
         }
         case "cancelForm":
           return formsApi.cancel();
+        case "renamePropertyType":
+        case "setPropertyTypeStatus": {
+          const result =
+            call.name === "renamePropertyType"
+              ? await renamePropertyType(
+                  formsApi.context.queryClient,
+                  getStringArg(args, "name"),
+                  getStringArg(args, "newName"),
+                )
+              : await setPropertyTypeStatus(
+                  formsApi.context.queryClient,
+                  getStringArg(args, "name"),
+                  args?.active === true,
+                );
+          if (result.ok && typeof result.saved === "string") showToast(t("saved", { name: result.saved }));
+          return result;
+        }
         default:
           return { ok: false, error: `Unknown tool "${call.name ?? ""}".` };
       }

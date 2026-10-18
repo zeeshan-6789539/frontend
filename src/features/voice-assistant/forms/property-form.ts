@@ -4,7 +4,7 @@ import { createProperty } from "@/features/properties/api/properties.api";
 import { propertySchema } from "@/features/properties/schemas/property-schema";
 import { getNumber, getText } from "@/features/voice-assistant/forms/form-values";
 import { buildPropertyLabel } from "@/utils/property";
-import type { IPropertyPayload, TPropertyType } from "@/types/property";
+import type { IPropertyPayload } from "@/types/property";
 import type { IAssistantFormDef } from "@/types/voice-assistant";
 
 export const propertyForm: IAssistantFormDef<IPropertyPayload> = {
@@ -13,7 +13,7 @@ export const propertyForm: IAssistantFormDef<IPropertyPayload> = {
   errorsKey: "properties.errors",
   listPath: "/properties",
   schema: propertySchema,
-  defaults: { name: "", propertyType: "", addressLine1: "", city: "", rentDueDay: "" },
+  defaults: { name: "", propertyTypeId: "", addressLine1: "", city: "", rentDueDay: "" },
   fields: [
     {
       key: "name",
@@ -23,12 +23,13 @@ export const propertyForm: IAssistantFormDef<IPropertyPayload> = {
       hint: "A short name for the property, 2-255 characters, e.g. 'Sunset Apartments flat 4'.",
     },
     {
-      key: "propertyType",
+      key: "propertyTypeId",
       labelKey: "properties.fields.propertyType",
       kind: "select",
       required: true,
       source: "propertyTypes",
-      hint: "Home, apartment, room, shop, office, warehouse, land or other.",
+      createWith: "propertyType",
+      hint: "One of the company's own property types, e.g. home, apartment or shop. Read the options list for the exact choices.",
     },
     {
       key: "addressLine1",
@@ -49,7 +50,7 @@ export const propertyForm: IAssistantFormDef<IPropertyPayload> = {
     name: getText(values, "name").trim(),
     addressLine1: getText(values, "addressLine1").trim(),
     city: getText(values, "city").trim(),
-    propertyType: getText(values, "propertyType") as TPropertyType,
+    propertyTypeId: getText(values, "propertyTypeId"),
     rentDueDay: getNumber(values, "rentDueDay"),
     status: true,
   }),

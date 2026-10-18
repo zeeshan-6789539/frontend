@@ -1,4 +1,4 @@
-import { Building2, FileText, LayoutDashboard, Users } from "lucide-react";
+import { Building2, FileText, LayoutDashboard, Tags, Users } from "lucide-react";
 import type { INavItem } from "@/types/navigation";
 
 export const navItems: readonly INavItem[] = [
@@ -14,6 +14,12 @@ export const navItems: readonly INavItem[] = [
     href: "/properties",
     labelKey: "properties",
     icon: Building2,
+    roles: ["client_admin"],
+  },
+  {
+    href: "/property-types",
+    labelKey: "propertyTypes",
+    icon: Tags,
     roles: ["client_admin"],
   },
   {

@@ -2,6 +2,7 @@ import { ASSISTANT_SEARCH_LIMIT } from "@/config/assistant";
 import { fetchLeases } from "@/features/leases/api/leases.api";
 import { fetchPayments } from "@/features/payments/api/payments.api";
 import { fetchProperties } from "@/features/properties/api/properties.api";
+import { fetchPropertyTypes } from "@/features/property-types/api/property-types.api";
 import { fetchTenants } from "@/features/tenants/api/tenants.api";
 import { formatNumber } from "@/utils/format";
 import { buildLeaseLabel } from "@/utils/lease";
@@ -33,10 +34,25 @@ export const searchRecords = async (
         id: property.id,
         title: buildPropertyLabel(property),
         subtitle: [
-          property.propertyType,
+          property.propertyTypeName,
           property.city,
           property.tenants.map((tenant) => tenant.name).join(", ") || "vacant",
         ].join(" · "),
+      })),
+    };
+  }
+
+  if (module === "propertyTypes") {
+    const result = await fetchPropertyTypes(params);
+    return {
+      module,
+      query,
+      path: "/property-types",
+      total: result.meta.totalItems,
+      items: result.items.map((propertyType) => ({
+        id: propertyType.id,
+        title: propertyType.name,
+        subtitle: propertyType.status ? "active" : "deactivated",
       })),
     };
   }
