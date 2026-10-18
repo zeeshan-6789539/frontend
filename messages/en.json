@@ -68,7 +68,7 @@
     "title": "Sign in",
     "subtitle": "Use your RMS email and password to continue.",
     "email": "Email",
-    "emailPlaceholder": "superadmin@rms.local",
+    "emailPlaceholder": "superadmin@mifa.mifa",
     "password": "Password",
     "passwordPlaceholder": "••••••••",
     "showPassword": "Show password",
