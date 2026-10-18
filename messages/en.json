@@ -66,7 +66,7 @@
   },
   "auth": {
     "title": "Sign in",
-    "subtitle": "Use your RMS email and password to continue.",
+    "subtitle": "Use your {appName} email and password to continue.",
     "email": "Email",
     "emailPlaceholder": "superadmin@mifa.mifa",
     "password": "Password",
