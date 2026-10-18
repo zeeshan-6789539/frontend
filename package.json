@@ -1,7 +1,12 @@
 {
-  "name": "rms-frontend",
+  "name": "property-dealers-frontend",
   "version": "0.1.0",
+  "description": "Property Dealer Management System frontend",
   "private": true,
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=11"
+  },
   "scripts": {
     "dev": "next dev -p 5001",
     "build": "next build",

@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
 import { navItems } from "@/config/navigation";
+import { isNavItemVisible } from "@/utils/access";
 import { cn } from "@/utils/cn";
 import type { IAppNavProps } from "@/types/layout";
 
@@ -12,10 +13,7 @@ export const AppNav = ({ onNavigate }: IAppNavProps) => {
   const pathname = usePathname();
   const { data: user } = useCurrentUser();
 
-  // A restricted item stays hidden until the role is known
-  const visibleItems = navItems.filter(
-    ({ roles }) => !roles || (user ? roles.includes(user.role) : false),
-  );
+  const visibleItems = navItems.filter((item) => isNavItemVisible(item, user));
 
   return (
     <nav className="flex flex-col gap-1">

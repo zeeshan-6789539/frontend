@@ -10,4 +10,5 @@ export const companySchema = z.object({
   address: z.string().max(500, "addressLength").optional(),
   city: z.string().max(100, "cityLength").optional(),
   status: z.boolean(),
+  voiceAssistantEnabled: z.boolean(),
 });

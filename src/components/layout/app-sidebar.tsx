@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { ChefHat, Menu, X } from "lucide-react";
+import { Building2, Menu, X } from "lucide-react";
 import { AppNav } from "@/components/layout/app-nav";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { PoweredBy } from "@/components/layout/powered-by";
@@ -59,7 +59,7 @@ export const AppSidebar = () => {
             className="flex min-w-0 items-center gap-2.5 font-semibold"
           >
             <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-gradient text-primary-foreground shadow-brand">
-              <ChefHat className="h-4.5 w-4.5" aria-hidden />
+              <Building2 className="h-4.5 w-4.5" aria-hidden />
             </span>
             <span className="truncate">{brandName}</span>
           </Link>

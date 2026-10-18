@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ChefHat } from "lucide-react";
+import { Building2 } from "lucide-react";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { PoweredBy } from "@/components/layout/powered-by";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
@@ -28,7 +28,7 @@ const LoginPage = async ({ params }: PageProps<"/[locale]/login">) => {
       <div className="flex w-full max-w-sm items-center justify-between">
         <span className="flex items-center gap-2.5 font-semibold">
           <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-brand-gradient text-primary-foreground shadow-brand">
-            <ChefHat className="h-5 w-5" aria-hidden />
+            <Building2 className="h-5 w-5" aria-hidden />
           </span>
           {siteConfig.name}
         </span>

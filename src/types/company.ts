@@ -6,6 +6,7 @@ export interface ICompany {
   address: string | null;
   city: string | null;
   status: boolean;
+  voiceAssistantEnabled: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -28,6 +29,7 @@ export interface ICompanyPayload {
   address?: string;
   city?: string;
   status: boolean;
+  voiceAssistantEnabled: boolean;
 }
 
 export interface ISaveCompanyArgs {
@@ -42,4 +44,5 @@ export interface ICompanyFormValues {
   address: string;
   city: string;
   status: boolean;
+  voiceAssistantEnabled: boolean;
 }

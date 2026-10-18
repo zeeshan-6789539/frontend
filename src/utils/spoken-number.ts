@@ -70,10 +70,9 @@ export const parseSpokenAmount = (input: string): number | null => {
   return Math.round(total + (pending ?? 0));
 };
 
-// Keeps the digits of a spoken phone number and a leading "+"
+// Keeps the digits of a spoken phone number, turning +92 / 0092 into the local 0 prefix
 export const normalizeSpokenPhone = (input: string): string => {
-  const text = toLatinDigits(input).trim();
-  const digits = text.replace(/\D/g, "");
+  const digits = toLatinDigits(input).replace(/\D/g, "");
 
-  return text.startsWith("+") ? `+${digits}` : digits;
+  return digits.replace(/^(?:00)?92(?=3\d{9}$)/, "0");
 };

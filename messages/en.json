@@ -195,6 +195,7 @@
       "status": "Status",
       "contact": "Contact",
       "location": "Location",
+      "voiceAssistant": "Voice assistant",
       "createdAt": "Created"
     },
     "errors": {
@@ -261,12 +262,12 @@
   },
   "propertyTypes": {
     "title": "Property types",
-    "subtitle": "Built-in types plus the ones you add, like Shop, Room or Portion.",
+    "subtitle": "Your property types, like Shop, Room or Portion. Rename, add or deactivate any of them.",
     "create": "New type",
     "createTitle": "New property type",
-    "createSubtitle": "Add a type that is missing from the built-in list.",
+    "createSubtitle": "Add a type that is missing from your list.",
     "editTitle": "Edit property type",
-    "editSubtitle": "Rename or deactivate your own type.",
+    "editSubtitle": "Rename or deactivate this type.",
     "edit": "Edit type",
     "deactivate": "Deactivate",
     "restore": "Reactivate",
@@ -281,12 +282,8 @@
     "emptyTitle": "No property types found",
     "emptySubtitle": "Adjust your filters, or add your own type.",
     "searchPlaceholder": "Search type name…",
-    "builtIn": "Built-in",
-    "custom": "Yours",
-    "builtInLocked": "Built-in, cannot be changed",
     "fields": {
       "name": "Name",
-      "source": "Source",
       "status": "Status",
       "createdAt": "Created"
     },
@@ -296,12 +293,12 @@
   },
   "facilities": {
     "title": "Facilities",
-    "subtitle": "Built-in facilities plus the ones you add, like Attached bath, Furnished or 2 bedrooms.",
+    "subtitle": "Your facilities, like Attached bath, Furnished or 2 bedrooms. Rename, add or deactivate any of them.",
     "create": "New facility",
     "createTitle": "New facility",
-    "createSubtitle": "Add a facility that is missing from the built-in list.",
+    "createSubtitle": "Add a facility that is missing from your list.",
     "editTitle": "Edit facility",
-    "editSubtitle": "Rename or deactivate your own facility.",
+    "editSubtitle": "Rename or deactivate this facility.",
     "edit": "Edit facility",
     "deactivate": "Deactivate",
     "restore": "Reactivate",
@@ -316,12 +313,8 @@
     "emptyTitle": "No facilities found",
     "emptySubtitle": "Adjust your filters, or add your own facility.",
     "searchPlaceholder": "Search facility name…",
-    "builtIn": "Built-in",
-    "custom": "Yours",
-    "builtInLocked": "Built-in, cannot be changed",
     "fields": {
       "name": "Name",
-      "source": "Source",
       "status": "Status",
       "createdAt": "Created"
     },
@@ -574,7 +567,7 @@
       "75": "Ignores facilities",
       "50": "Ignores facilities and area",
       "25": "Ignores facilities, area and budget",
-      "0": "Rent or buy only"
+      "0": "Rent or buy and type only"
     },
     "choose": "Choose",
     "backToMatches": "Back to matches",

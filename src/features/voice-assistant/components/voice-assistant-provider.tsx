@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useRef } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { ASSISTANT_FORM_ROLES, ASSISTANT_ROLES } from "@/config/assistant";
+import { ASSISTANT_FORM_ROLES } from "@/config/assistant";
 import { navItems } from "@/config/navigation";
 import { useCurrentUser } from "@/features/auth/hooks/use-current-user";
 import { VoiceAssistantContext } from "@/features/voice-assistant/context/voice-assistant-context";
@@ -21,6 +21,7 @@ import { useAssistantTranscript } from "@/features/voice-assistant/hooks/use-ass
 import { useLiveSession } from "@/features/voice-assistant/hooks/use-live-session";
 import { useToast } from "@/hooks/use-toast";
 import { usePathname, useRouter } from "@/i18n/navigation";
+import { canUseVoiceAssistant, isNavItemVisible } from "@/utils/access";
 import { getTodayIsoDate } from "@/utils/format";
 import type { FunctionCall } from "@google/genai";
 import type { TLocale } from "@/types/locale";
@@ -48,15 +49,15 @@ export const VoiceAssistantProvider = ({ children }: IAssistantProviderProps) =>
   const lastNotifiedRef = useRef<Record<string, string>>({});
 
   const role = user?.role;
-  const isAvailable = role !== undefined && ASSISTANT_ROLES.includes(role);
+  const isAvailable = canUseVoiceAssistant(user);
   const canUseForms = role !== undefined && ASSISTANT_FORM_ROLES.includes(role);
 
   const pages = useMemo(
     () =>
       navItems
-        .filter((item) => !item.roles || (role !== undefined && item.roles.includes(role)))
+        .filter((item) => isNavItemVisible(item, user))
         .map((item) => ({ key: item.labelKey, href: item.href })),
-    [role],
+    [user],
   );
 
   const getSetup = useCallback((): ILiveSessionSetup => {

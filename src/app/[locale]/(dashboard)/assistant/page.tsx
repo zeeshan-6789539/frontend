@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { RequireRole } from "@/components/layout/require-role";
 import { ASSISTANT_ROLES } from "@/config/assistant";
 import { AssistantView } from "@/features/voice-assistant/components/assistant-view";
+import { canUseVoiceAssistant } from "@/utils/access";
 
 export const generateMetadata = async ({
   params,
@@ -18,7 +19,7 @@ const AssistantPage = async ({ params }: PageProps<"/[locale]/assistant">) => {
   setRequestLocale(locale);
 
   return (
-    <RequireRole roles={ASSISTANT_ROLES}>
+    <RequireRole roles={ASSISTANT_ROLES} isAllowed={canUseVoiceAssistant}>
       <AssistantView />
     </RequireRole>
   );

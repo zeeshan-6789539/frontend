@@ -1,6 +1,6 @@
 # RMS Frontend
 
-Restaurant Management System frontend built on Next.js 16 (App Router + Turbopack).
+Property Dealer Management System frontend built on Next.js 16 (App Router + Turbopack).
 
 ## Stack
 
@@ -16,9 +16,11 @@ Restaurant Management System frontend built on Next.js 16 (App Router + Turbopac
 
 ## Getting started
 
+Requires Node.js >= 22 and pnpm >= 11 (same as the backend).
+
 ```bash
 pnpm install
-cp .env.example .env.local
+cp .env.example .env
 pnpm dev
 ```
 
@@ -33,13 +35,14 @@ That URL is the backend host plus its global prefix (`API_PREFIX=api`) and URI v
 
 ### Environment variables
 
-All are optional; the defaults live in [src/config/site.ts](src/config/site.ts). `NEXT_PUBLIC_*`
-values are inlined at build time, so restart `pnpm dev` or rebuild after changing them.
+All are optional; the defaults live in [src/config/site.ts](src/config/site.ts). Locally they are read
+from `.env` (gitignored, the only env file); in production they are set in the Vercel project settings.
+`NEXT_PUBLIC_*` values are inlined at build time, so restart `pnpm dev` or rebuild after changing them.
 
 | Variable                        | Default                         | Purpose                                     |
 | ------------------------------- | ------------------------------- | ------------------------------------------- |
 | `NEXT_PUBLIC_API_BASE_URL`      | `http://localhost:5000/api/v1`  | Backend host + prefix + version             |
-| `NEXT_PUBLIC_COMPANY_NAME`      | `Restaurant Management System`  | Full company name, used as the site description |
+| `NEXT_PUBLIC_COMPANY_NAME`      | `Property Dealer Management System` | Full company name, used as the site description |
 | `NEXT_PUBLIC_COMPANY_SHOT_NAME` | `RMS`                           | Short company name, used as the site name   |
 
 ### Scripts
@@ -124,6 +127,10 @@ cannot be deactivated while it still has active users, and passwords cannot be c
 through `PATCH /users/:id` — `UpdateUserDto` omits the field, so the edit dialog does not
 offer it.
 
+The company dialog also has a **Voice assistant** Yes/No field (`voiceAssistantEnabled`, default No),
+shown as a column in the companies table. It decides whether that company's client admins get the
+[voice assistant](#voice-assistant).
+
 The dashboard reads its counters from the same list endpoints (`meta.totalItems` with
 `limit=1`), so no extra backend route is needed.
 
@@ -143,16 +150,18 @@ dealer's own company, so the screens never pass a company id.
   city with any number of its areas in a multi-select, facilities), with an `open` / `matched` / `closed` status. **Matches** opens
   the active, available listings that fit, from `GET /property-requirements/:id/matches`;
   a listing must have every facility the requirement asks for. A **Match level** slider (0 / 25 / 50 / 75 / 100%)
-  relaxes this by ignoring facilities, then area, then budget, then type and city. **Choose** on a match marks
+  relaxes this by ignoring facilities, then area, then budget, then city. **Choose** on a match marks
   that listing sold or rented and the requirement matched, via
   `PATCH /property-requirements/:id/match`. The full flow, from page
   load to matching and closing, is in [docs/requirements-flow.md](docs/requirements-flow.md).
-- **Contacts** — owners and seekers; phone numbers are unique per dealer.
+- **Contacts** — owners and seekers; phone numbers are unique per dealer and must be 11 digits like
+  `03001234567` (a spoken `+92…` number is converted to that form).
 - **Cities & areas** (`/locations`) — two panes: cities on the left, the selected city's areas
   on the right. Areas are added inline (type a name, press Enter, type the next), and the edit
   dialog renames an area, moves it to another city or changes its status. A city with active
   areas cannot be deactivated until its areas are.
-- **Property types** — built-in types are read-only; dealers add and manage their own.
+- **Property types** — every company starts with its own copy of the defaults (House, Shop, …) and can
+  rename, deactivate or add to any of them.
 - **Facilities** — same rules as property types. Listings and requirements (sale or rent) pick
   any number of them through the searchable [`MultiSelect`](src/components/ui/multi-select.tsx),
   which opens inline below the field so it is never clipped inside a modal.
@@ -169,7 +178,9 @@ comes from the existing list endpoints with `limit=1`, aggregated in
 
 ## Voice assistant
 
-**Voice assistant** in the sidebar (`/assistant`, super admin and client admin) is a full-page conversation with
+**Voice assistant** (`/assistant`, opened from the floating orb's expand button rather than the sidebar; client admins whose
+company has **Voice assistant** set to Yes on the Companies screen, otherwise the page and the orb are hidden, see
+[utils/access.ts](src/utils/access.ts)) is a full-page conversation with
 Gemini. On every other dashboard page, a floating orb in the bottom corner opens a compact panel connected to
 the same session, so the user can talk from anywhere. Both are in
 [src/features/voice-assistant/](src/features/voice-assistant/).

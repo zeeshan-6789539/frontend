@@ -27,6 +27,7 @@ const toFormValues = (company: ICompany | null): ICompanyFormValues => ({
   address: company?.address ?? "",
   city: company?.city ?? "",
   status: company?.status ?? true,
+  voiceAssistantEnabled: company?.voiceAssistantEnabled ?? false,
 });
 
 const toPayload = (values: ICompanyFormValues) => ({
@@ -36,6 +37,7 @@ const toPayload = (values: ICompanyFormValues) => ({
   address: emptyToUndefined(values.address),
   city: emptyToUndefined(values.city),
   status: values.status,
+  voiceAssistantEnabled: values.voiceAssistantEnabled,
 });
 
 export const CompanyFormDialog = ({
@@ -61,6 +63,11 @@ export const CompanyFormDialog = ({
   const statusOptions = [
     { value: "true", label: tCommon("active") },
     { value: "false", label: tCommon("deactivated") },
+  ];
+
+  const yesNoOptions = [
+    { value: "true", label: tCommon("yes") },
+    { value: "false", label: tCommon("no") },
   ];
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -163,6 +170,16 @@ export const CompanyFormDialog = ({
               value={String(values.status)}
               onChange={(value) => setValue("status", value === "true")}
               options={statusOptions}
+              disabled={isPending}
+            />
+          </FormField>
+
+          <FormField id="voiceAssistantEnabled" label={t("fields.voiceAssistant")}>
+            <Select
+              id="voiceAssistantEnabled"
+              value={String(values.voiceAssistantEnabled)}
+              onChange={(value) => setValue("voiceAssistantEnabled", value === "true")}
+              options={yesNoOptions}
               disabled={isPending}
             />
           </FormField>

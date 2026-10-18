@@ -1,7 +1,7 @@
 import type { TUserRole } from "@/types/user";
 
 // Mirrors @Roles on the backend's AssistantController; only dealers get the add-record forms
-export const ASSISTANT_ROLES: readonly TUserRole[] = ["super_admin", "client_admin"];
+export const ASSISTANT_ROLES: readonly TUserRole[] = ["client_admin"];
 export const ASSISTANT_FORM_ROLES: readonly TUserRole[] = ["client_admin"];
 
 // Gemini Live expects 16 kHz PCM in and sends 24 kHz PCM back

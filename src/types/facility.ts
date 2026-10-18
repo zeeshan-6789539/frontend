@@ -1,7 +1,6 @@
 export interface IFacility {
   id: string;
   name: string;
-  isBuiltIn: boolean;
   status: boolean;
   createdAt: string;
   updatedAt: string;

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { Maximize2, Minus } from "lucide-react";
+import { Maximize2, Minus, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ASSISTANT_PATH } from "@/config/assistant";
 import { AssistantLiveBar } from "@/features/voice-assistant/components/assistant-live-bar";
@@ -57,9 +57,13 @@ export const FloatingAssistant = () => {
           type="button"
           onClick={() => setIsOpen(true)}
           aria-label={t("openPanel")}
-          className="rounded-full shadow-brand transition-transform hover:scale-105 focus-visible:scale-105"
+          className="voice-launcher relative rounded-full shadow-brand transition-transform hover:scale-105 focus-visible:scale-105"
         >
           <VoiceOrb status={status} level={level} size="md" />
+          <Sparkles
+            className="voice-launcher-icon pointer-events-none absolute inset-0 m-auto h-5 w-5 text-primary-foreground drop-shadow-sm"
+            aria-hidden
+          />
         </button>
       ) : null}
     </div>

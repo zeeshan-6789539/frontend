@@ -384,9 +384,33 @@
 .voice-orb[data-level="4"] .voice-orb-core { transform: scale(1.16); }
 .voice-orb[data-level="5"] .voice-orb-core { transform: scale(1.2); }
 
+/* Floating launcher keeps the orb alive while idle so it draws the eye */
+@keyframes launcher-twinkle {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  25% { transform: scale(0.82) rotate(-12deg); opacity: 0.8; }
+  50% { transform: scale(1.12) rotate(8deg); opacity: 1; }
+  75% { transform: scale(0.94) rotate(0deg); opacity: 0.9; }
+}
+
+.voice-launcher .voice-orb[data-status="idle"] .voice-orb-core {
+  filter: none;
+  animation: orb-spin 6s linear infinite;
+}
+
+.voice-launcher .voice-orb[data-status="idle"] .voice-orb-ring {
+  animation: orb-ripple 2.4s ease-out infinite;
+}
+
+.voice-launcher-icon {
+  animation: launcher-twinkle 2.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .voice-orb .voice-orb-core,
-  .voice-orb .voice-orb-ring {
+  .voice-orb .voice-orb-ring,
+  .voice-launcher .voice-orb .voice-orb-core,
+  .voice-launcher .voice-orb .voice-orb-ring,
+  .voice-launcher-icon {
     animation: none;
     transform: none;
   }

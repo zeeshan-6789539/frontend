@@ -214,7 +214,7 @@ A **Match level** slider under the dialog title (0% on the left, 100% on the rig
 | 75% (default) | Everything except facilities |
 | 50% | Also ignores area |
 | 25% | Also ignores budget |
-| 0% | Also ignores type and city — only purpose, active and available |
+| 0% | Also ignores city — only type, purpose, active and available |
 
 **At 100%, a listing is a match when all of these hold** (empty requirement fields are ignored):
 

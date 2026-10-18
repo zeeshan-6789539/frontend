@@ -29,7 +29,6 @@ export const FacilitiesTable = ({
       <TableHead>
         <TableRow className="hover:bg-transparent">
           <TableHeaderCell>{t("fields.name")}</TableHeaderCell>
-          <TableHeaderCell>{t("fields.source")}</TableHeaderCell>
           <TableHeaderCell>{t("fields.status")}</TableHeaderCell>
           <TableHeaderCell>{t("fields.createdAt")}</TableHeaderCell>
           <TableHeaderCell className="text-end">{tCommon("actions")}</TableHeaderCell>
@@ -44,12 +43,6 @@ export const FacilitiesTable = ({
             </TableCell>
 
             <TableCell>
-              <Badge variant={facility.isBuiltIn ? "muted" : "info"}>
-                {facility.isBuiltIn ? t("builtIn") : t("custom")}
-              </Badge>
-            </TableCell>
-
-            <TableCell>
               <Badge variant={facility.status ? "success" : "muted"}>
                 {facility.status ? tCommon("active") : tCommon("deactivated")}
               </Badge>
@@ -60,35 +53,31 @@ export const FacilitiesTable = ({
             </TableCell>
 
             <TableCell>
-              {facility.isBuiltIn ? (
-                <p className="text-end text-xs text-muted-foreground">{t("builtInLocked")}</p>
-              ) : (
-                <div className="flex items-center justify-end gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onEdit(facility)}
-                    aria-label={t("edit")}
-                    title={t("edit")}
-                  >
-                    <Pencil className="h-4 w-4" aria-hidden />
-                  </Button>
+              <div className="flex items-center justify-end gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onEdit(facility)}
+                  aria-label={t("edit")}
+                  title={t("edit")}
+                >
+                  <Pencil className="h-4 w-4" aria-hidden />
+                </Button>
 
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => onToggleStatus(facility)}
-                    aria-label={facility.status ? t("deactivate") : t("restore")}
-                    title={facility.status ? t("deactivate") : t("restore")}
-                  >
-                    {facility.status ? (
-                      <Power className="h-4 w-4 text-danger" aria-hidden />
-                    ) : (
-                      <RotateCcw className="h-4 w-4 text-success" aria-hidden />
-                    )}
-                  </Button>
-                </div>
-              )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onToggleStatus(facility)}
+                  aria-label={facility.status ? t("deactivate") : t("restore")}
+                  title={facility.status ? t("deactivate") : t("restore")}
+                >
+                  {facility.status ? (
+                    <Power className="h-4 w-4 text-danger" aria-hidden />
+                  ) : (
+                    <RotateCcw className="h-4 w-4 text-success" aria-hidden />
+                  )}
+                </Button>
+              </div>
             </TableCell>
           </TableRow>
         ))}
