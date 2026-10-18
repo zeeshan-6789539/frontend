@@ -23,3 +23,7 @@ export interface IRequireRoleProps {
 export interface IDealerOnlyProps {
   children: ReactNode;
 }
+
+export interface IAssistantOnlyProps {
+  children: ReactNode;
+}
