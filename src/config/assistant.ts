@@ -1,23 +1,27 @@
-import type { TAssistantScript } from "@/types/assistant";
-import type { TLocale } from "@/types/locale";
+import type { TUserRole } from "@/types/user";
 
-// Mirrors AI_CHAT_HISTORY_MAX_ITEMS, AI_CHAT_MESSAGE_MAX_LENGTH and AI_SPEECH_TEXT_MAX_LENGTH on the backend
-export const ASSISTANT_HISTORY_LIMIT = 20;
-export const ASSISTANT_MESSAGE_MAX_LENGTH = 2000;
-export const ASSISTANT_SPEECH_MAX_LENGTH = 600;
+// Mirrors @Roles on the backend's AssistantController; only company admins get the add-record forms
+export const ASSISTANT_ROLES: readonly TUserRole[] = ["client_admin"];
+export const ASSISTANT_FORM_ROLES: readonly TUserRole[] = ["client_admin"];
 
-// The backend allows 60 s for chat and transcription, 100 s for speech
-export const ASSISTANT_REQUEST_TIMEOUT_MS = 65_000;
-export const ASSISTANT_SPEECH_TIMEOUT_MS = 105_000;
+// Gemini Live expects 16 kHz PCM in and sends 24 kHz PCM back
+export const ASSISTANT_INPUT_SAMPLE_RATE = 16_000;
+export const ASSISTANT_OUTPUT_SAMPLE_RATE = 24_000;
+export const ASSISTANT_INPUT_MIME_TYPE = `audio/pcm;rate=${ASSISTANT_INPUT_SAMPLE_RATE}`;
 
-// Browser voice used only when Gemini's voice is unavailable
-export const SPEECH_LANGUAGES: Record<TLocale, string> = {
-  en: "en-US",
-  ur: "ur-PK",
-};
+export const ASSISTANT_CAPTURE_WORKLET_PATH = "/worklets/pcm-capture-processor.js";
+export const ASSISTANT_CAPTURE_WORKLET_NAME = "pcm-capture-processor";
 
-// English UI users usually type Urdu in Latin letters, so they get Roman Urdu back
-export const TRANSCRIPT_SCRIPTS: Record<TLocale, TAssistantScript> = {
-  en: "roman",
-  ur: "urdu",
-};
+// Must match the Live token's API version issued by the backend
+export const ASSISTANT_API_VERSION = "v1alpha";
+
+export const ASSISTANT_PATH = "/assistant";
+
+export const ASSISTANT_OPTIONS_QUERY_KEY = ["assistant-options"] as const;
+
+// Orb animation steps; the level is quantised so it can drive a data attribute
+export const ASSISTANT_LEVEL_STEPS = 5;
+
+export const ASSISTANT_MAX_OPTIONS_READ_ALOUD = 8;
+export const ASSISTANT_SEARCH_LIMIT = 5;
+export const ASSISTANT_TRANSCRIPT_LIMIT = 80;

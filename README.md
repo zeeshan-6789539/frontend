@@ -1,6 +1,6 @@
 # RMS Frontend
 
-**Rent Management System UI**: the admin web app for the multi-company rent platform. Super admins use it to onboard companies and users. Company admins use it to run properties, tenants, leases, ledgers and payments, to print invoices and statements, and to ask an AI assistant about their data by typing or by voice.
+**Rent Management System UI**: the admin web app for the multi-company rent platform. Super admins use it to onboard companies and users. Company admins use it to run properties, tenants, leases, ledgers and payments, to print invoices and statements, and, when their company has it switched on, to talk to a Gemini voice assistant that adds properties, tenants, leases and payments and searches their records.
 
 Next.js 16 (App Router + Turbopack). The API is in the sibling repo [`rms-backend`](../rms-backend/README.md), which also documents the full database schema and business rules.
 
@@ -15,9 +15,10 @@ Next.js 16 (App Router + Turbopack). The API is in the sibling repo [`rms-backen
 5. [User flows](#user-flows)
 6. [Data fetching](#data-fetching)
 7. [Auth and session](#auth-and-session)
-8. [Language switching](#language-switching)
-9. [Theming](#theming)
-10. [Conventions](#conventions)
+8. [Voice assistant](#voice-assistant)
+9. [Language switching](#language-switching)
+10. [Theming](#theming)
+11. [Conventions](#conventions)
 
 ---
 
@@ -34,7 +35,7 @@ Next.js 16 (App Router + Turbopack). The API is in the sibling repo [`rms-backen
 | Charts | Recharts 3 |
 | PDF | jsPDF + jspdf-autotable (built in the browser) |
 | Icons | lucide-react |
-| Voice | Browser mic recording (`AudioWorklet` → 16 kHz WAV) with transcription and an Urdu-accent voice from the backend's Gemini routes; browser `speechSynthesis` only as fallback. No extra package |
+| Voice | `@google/genai` (Gemini Live) in the browser: `AudioWorklet` mic capture sent as 16 kHz PCM, 24 kHz audio replies; a short-lived token comes from the backend |
 
 ---
 
@@ -42,7 +43,7 @@ Next.js 16 (App Router + Turbopack). The API is in the sibling repo [`rms-backen
 
 ```bash
 pnpm install
-cp .env.example .env.local
+cp .env.example .env
 pnpm dev
 ```
 
@@ -53,6 +54,18 @@ NEXT_PUBLIC_API_BASE_URL=http://localhost:5000/api/v1
 ```
 
 That URL is the backend host plus its global prefix (`API_PREFIX=api`) and URI version (`API_VERSION=1`). The backend must list `http://localhost:5001` in `CORS_ORIGINS`.
+
+### Environment variables
+
+All are optional; the defaults live in [src/config/site.ts](src/config/site.ts). Locally they are read from `.env` (gitignored, the only env file); in production they are set in the Vercel project settings. `NEXT_PUBLIC_*` values are inlined at build time, so restart `pnpm dev` or rebuild after changing them. [.env.example](.env.example) is the committed template.
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `NEXT_PUBLIC_API_BASE_URL` | `http://localhost:5000/api/v1` | Backend host + prefix + version |
+| `NEXT_PUBLIC_COMPANY_NAME` | `Rent Management System` | Full company name, used as the site description |
+| `NEXT_PUBLIC_COMPANY_SHOT_NAME` | `RMS` | Short company name, used as the site name and in the login subtitle |
+
+The Gemini key is not a frontend variable: the backend keeps `GOOGLE_STUDIO_KEY` and hands the browser a short-lived token.
 
 | Script | What it does |
 | --- | --- |
@@ -81,7 +94,8 @@ Every route has a locale prefix (`/en/...`, `/ur/...`).
 | `/leases/[id]` | Lease detail: ledger statement, charges, payments, PDFs | client_admin | via lease list |
 | `/ledger` | Company-wide ledger, filterable by lease | client_admin | URL only |
 | `/payments` | Company-wide payments list | client_admin | URL only |
-| Every signed-in page | AI assistant: floating button, bottom corner | client_admin | — |
+| `/assistant` | Full-page Gemini voice assistant | client_admin, company has **Voice assistant** on | via the orb's expand button |
+| Every other signed-in page | Voice assistant: floating orb, bottom corner | client_admin, company has **Voice assistant** on | — |
 
 The sidebar filters links by `roles` in [src/config/navigation.ts](src/config/navigation.ts). Every page is also wrapped in [`RequireRole`](src/components/layout/require-role.tsx), which reads `GET /auth/me`. The backend enforces the same rules, so the UI checks only keep the screens consistent with what the API allows.
 
@@ -93,6 +107,7 @@ The sidebar filters links by `roles` in [src/config/navigation.ts](src/config/na
 rms-frontend/
 ├── messages/                    # en.json, ur.json translation catalogues
 ├── public/
+│   └── worklets/                # pcm-capture-processor.js (mic AudioWorklet for the voice assistant)
 ├── next.config.ts
 └── src/
     ├── proxy.ts                 # Next 16 "proxy" (middleware): locale prefix + auth redirect
@@ -107,8 +122,9 @@ rms-frontend/
     │           ├── page.tsx     # DashboardRouter
     │           ├── companies/   users/                     # super_admin
     │           ├── properties/  tenants/  leases/  leases/[id]/  ledger/  payments/   # client_admin
+    │           └── assistant/   # Full-page Gemini voice assistant (client_admin + company flag)
     ├── components/
-    │   ├── layout/              # app-sidebar, app-nav, user-menu, require-role, page-heading,
+    │   ├── layout/              # app-sidebar, app-nav, user-menu, require-role, assistant-only, page-heading,
     │   │                        # language-switcher, theme-toggle, powered-by
     │   ├── providers/           # app, query, theme, toast providers
     │   └── ui/                  # alert, badge, button, card, confirm-dialog, date(-time)-picker,
@@ -118,7 +134,7 @@ rms-frontend/
     ├── features/                # One slice per backend module
     │   ├── auth/  companies/  users/  dashboard/
     │   ├── properties/  tenants/  leases/  ledger/  payments/
-    │   ├── assistant/           # AI chat panel + voice (launcher, panel, composer, use-assistant-chat)
+    │   ├── voice-assistant/     # Gemini Live session, audio, engine, voice-guided forms (see Voice assistant)
     │   └── <feature>/
     │       ├── api/             # <feature>.api.ts fetchers + <feature>-keys.ts query keys
     │       ├── components/      # <feature>-view, -table, -form-dialog (+ feature-specific dialogs)
@@ -126,8 +142,7 @@ rms-frontend/
     │       │                    # use-<feature>-options (for selects)
     │       ├── schemas/         # Zod schemas mirroring the backend DTOs
     │       └── types/           # Component prop interfaces
-    ├── hooks/                   # use-debounced-value, use-form-state, use-is-hydrated, use-toast,
-    │                            # use-audio-recorder, use-speech-synthesis
+    ├── hooks/                   # use-debounced-value, use-form-state, use-is-hydrated, use-toast
     ├── i18n/                    # routing (locales), navigation (localised Link/router), request config
     ├── lib/
     │   ├── api-client.ts        # Axios instance: base URL, bearer token, envelope unwrap, 401 refresh
@@ -135,8 +150,9 @@ rms-frontend/
     │   └── query-client.ts      # TanStack QueryClient factory
     ├── types/                   # Shared I-prefixed interfaces / T-prefixed unions, one file per domain
     └── utils/                   # cn, format (currency/date), cookie, query-params, status, period,
-                                 # lease label, ledger-display, pdf / invoice-pdf / ledger-pdf, zod helpers,
-                                 # speech, wav (downsample + encode), base64
+                                 # lease / property labels, ledger-display, pdf / invoice-pdf / ledger-pdf, zod helpers,
+                                 # access (role + feature checks), options, audio (PCM), fuzzy-match,
+                                 # spoken-number, spoken-date
 ```
 
 ---
@@ -162,7 +178,7 @@ sequenceDiagram
 
 ### Super admin: onboard a company
 
-1. **Companies → New.** Enter the name, contact details and city. Optionally add the company's SMTP email and mail password and turn on **invoice email**, so that generated rent invoices go to that company's tenants.
+1. **Companies → New.** Enter the name, contact details and city. Optionally add the company's SMTP email and mail password and turn on **invoice email**, so that generated rent invoices go to that company's tenants. Set **Voice assistant** to Yes (`voiceAssistantEnabled`, default No, also shown as a column in the companies table) to give the company's client admins the [voice assistant](#voice-assistant).
 2. **Users → New.** Create a `client_admin` and assign it to the company. The backend emails the login details to the new user.
 3. **Dashboard.** The counters come from the list endpoints (`meta.totalItems` with `limit=1`), and there are lists of recently added companies and users. The **Generate monthly rent** button calls `POST /ledger/generate-monthly-rent` for every company and reports what was generated and what was skipped.
 
@@ -187,11 +203,7 @@ flowchart LR
 - **Lease detail** (`/leases/[id]`) is the main working screen. It shows the lease, its outstanding balance and the full ledger with running balances. It supports search and a period filter (all, current month, last month, last 3 months, last 6 months). From here the admin can add charges, record payments, deactivate or restore entries, change the rent or status, and open the PDFs.
 - **Deactivate, don't delete.** Every destructive action asks for confirmation and only sets `status` to false. A deactivated ledger entry stays on the statement, struck through and faded, and no longer counts towards the balance. Restoring it adds it back.
 - **PDFs** are built in the browser by [invoice-pdf.ts](src/utils/invoice-pdf.ts) and [ledger-pdf.ts](src/utils/ledger-pdf.ts), and open in a new tab. Each has the company name, an `INV-` / `LDG-` document number, the property number, the lease term and a "Powered by" footer.
-- **AI assistant.** A floating button opens a chat panel that calls the backend's `POST /ai/chat` (Gemini). For example: "who still owes rent?", "is mahine kis kis ka kiraya baqi hai?", "summarise this month". It understands English, Urdu script and Roman Urdu, and replies in the same one. It is read-only for now.
-  - **Voice input.** The mic records with [use-audio-recorder.ts](src/hooks/use-audio-recorder.ts), which stops by itself after a 1.5 s pause (30 s at most). The clip is sent as 16 kHz WAV to `POST /ai/transcribe`, and the transcript is asked as a question. Gemini copes with mixed Urdu-English speech. Urdu words come back in Urdu script on the Urdu UI and in Roman Urdu on the English UI ([config/assistant.ts](src/config/assistant.ts)). A clip with no speech never leaves the browser.
-  - **Voice output.** Answers to spoken questions are read aloud by `POST /ai/speech`, which uses a Gemini voice with a Pakistani Urdu accent. Each assistant bubble also has a 🔊 button to replay any answer, typed or spoken. The header speaker button turns automatic read-aloud off, and the stop button cuts it short. A reply takes a few seconds to voice, so the text appears first. If the Gemini voice fails, the browser's own voice takes over.
-  - **Browser support.** Works in any browser with microphone access and `AudioWorklet` (Chrome, Edge, Firefox, Safari).
-  - **Conversation state.** The backend is stateless, so [use-assistant-chat.ts](src/features/assistant/hooks/use-assistant-chat.ts) keeps the conversation and replays the last 20 turns as `history`. Closing the panel keeps the conversation; reloading the page clears it.
+- **Voice assistant.** Client admins whose company has it switched on can add records and search by voice. See [Voice assistant](#voice-assistant).
 
 ### Lists
 
@@ -223,6 +235,40 @@ Each feature slice owns its fetchers, query keys and hooks. Query keys are kept 
 - [src/proxy.ts](src/proxy.ts) guards routes before the page renders. An anonymous request is redirected to `/{locale}/login`, and a signed-in request to the login page is redirected to `/{locale}`.
 - The cookies are written client-side, so JavaScript can read them. If the backend ever sets `httpOnly` cookies itself, remove `auth-session.ts` and have the proxy read the cookie names directly.
 - Route names, cookie names and auth endpoints are in [src/config/auth.ts](src/config/auth.ts).
+
+---
+
+## Voice assistant
+
+The voice assistant is for client admins whose company has **Voice assistant** set to Yes on the Companies screen; for everyone else the sidebar link, the page and the orb are hidden ([utils/access.ts](src/utils/access.ts) checks `role` and the `voiceAssistantEnabled` flag from `GET /auth/me`). `/assistant` is a full-page conversation with Gemini. On every other dashboard page, a floating orb in the bottom corner opens a compact panel connected to the same session, so the user can talk from anywhere. Both are in [src/features/voice-assistant/](src/features/voice-assistant/).
+
+How a session works:
+
+1. The voice button in the one-line bar at the bottom (Gemini Live style: type or talk, mute, and a red button to end) calls `POST /assistant/session`, which returns a single-use Gemini token. The Google key stays on the backend, which answers 403 when the company doesn't have the assistant and 503 when no key is configured.
+2. The browser connects to Gemini Live directly. The mic is captured with an AudioWorklet ([public/worklets/pcm-capture-processor.js](public/worklets/pcm-capture-processor.js)) and sent as 16 kHz PCM. Replies come back as 24 kHz audio plus live transcripts, and the user can interrupt.
+3. Gemini acts through **tools** that run in the browser with the existing API fetchers, so the backend's role and company rules apply as usual:
+   - `navigate`, for any sidebar page the user can see;
+   - `searchRecords`, over properties, tenants, leases and payments;
+   - form tools: `startForm`, `fillFields`, `getFieldOptions`, `focusField`, `startNestedForm`, `reviewForm`, `submitForm`, `cancelForm`.
+
+**Voice-guided forms.** Saying "I want to add a tenant" opens a form card with the right control for each field: text box, date picker or dropdown. Gemini asks for one field at a time, required fields first, then asks once about optional fields.
+
+| Form | Fields | Saves through |
+| --- | --- | --- |
+| Property | name, type, address, city, rent due day | `createProperty` (`POST /properties`) |
+| Tenant | name, phone, email | `createTenant` (`POST /tenants`) |
+| Lease | property, tenant, start and end date, monthly rent, advance, document link | `createLease` (`POST /leases`) |
+| Payment | active lease, amount, date, method (cash preselected), reference, receipt, bank and cheque clearance date when relevant, notes | `createPayment` (`POST /payments`) |
+
+- **How fields are defined.** Each form is a config in [forms/](src/features/voice-assistant/forms/). A config lists the fields, where dropdown options come from and the same Zod schema the regular dialog uses, so voice and dialog validate alike. Adding a voice form means adding one config file.
+- **Several answers at once.** If the user gives several details in one sentence, they are filled together.
+- **Dropdowns.** A spoken name ("Sunset Apartments", "Ali Raza") is matched to a property, tenant or active lease by [utils/fuzzy-match.ts](src/utils/fuzzy-match.ts). When more than one option fits, Gemini asks which one.
+- **Amounts and dates.** Phrases like "1 lakh 20 hazar" or "85k" become rupees through [utils/spoken-number.ts](src/utils/spoken-number.ts); dates are passed as `YYYY-MM-DD` and checked by [utils/spoken-date.ts](src/utils/spoken-date.ts).
+- **Missing property, tenant or lease.** When the record doesn't exist yet, `startNestedForm` opens its form. Once it's saved, the parent form continues with the new record selected.
+- **Typing and clicking.** The user can also type or pick values on screen. Gemini gets a `[screen]` note for each change, and a typed amount is cleaned up the same way as a spoken one.
+- **Saving.** Nothing is saved until the review card is shown and the user confirms, by voice or with **Save**. After a save, the affected TanStack Query lists refresh.
+
+The assistant replies in the language the user speaks (English, Urdu or Roman Urdu), and defaults to the app's locale. Voice edit and delete are not supported yet; use the regular screens for those.
 
 ---
 

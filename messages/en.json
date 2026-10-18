@@ -38,7 +38,8 @@
     "tenants": "Tenants",
     "leases": "Leases",
     "payments": "Payments",
-    "ledger": "Ledger"
+    "ledger": "Ledger",
+    "assistant": "Voice assistant"
   },
   "sidebar": {
     "open": "Open menu",
@@ -76,9 +77,9 @@
   },
   "auth": {
     "title": "Sign in",
-    "subtitle": "Use your RMS email and password to continue.",
+    "subtitle": "Use your {appName} email and password to continue.",
     "email": "Email",
-    "emailPlaceholder": "superadmin@rms.local",
+    "emailPlaceholder": "superadmin@mifa.mifa",
     "password": "Password",
     "passwordPlaceholder": "••••••••",
     "showPassword": "Show password",
@@ -174,6 +175,7 @@
       "location": "Location",
       "propertyCount": "Properties",
       "tenantCount": "Tenants",
+      "voiceAssistant": "Voice assistant",
       "createdAt": "Created",
       "invoiceMailSend": "Send invoice emails",
       "mailPassword": "Mail password",
@@ -515,37 +517,64 @@
     }
   },
   "assistant": {
-    "open": "Ask the AI assistant",
-    "title": "AI assistant",
-    "subtitle": "Ask in English, Urdu or Roman Urdu",
-    "assistantLabel": "Assistant",
+    "title": "Voice assistant",
+    "subtitle": "Talk to Gemini to add properties, tenants, leases and payments, search your records or move around the app.",
+    "start": "Start talking",
+    "stop": "End",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "openPanel": "Open the voice assistant",
+    "openFull": "Open the full assistant page",
+    "minimize": "Minimise",
     "you": "You",
-    "placeholder": "Type a question or tap the mic…",
+    "assistantName": "Gemini",
     "send": "Send",
-    "startListening": "Ask by voice",
-    "stopListening": "Stop listening",
-    "listening": "Listening… just pause when you're done",
-    "micUnsupported": "Voice input needs microphone access, which this browser doesn't offer.",
-    "micErrors": {
-      "notAllowed": "Microphone access is blocked. Allow it in your browser's site settings, then try again.",
-      "noSpeech": "I didn't hear anything. Tap the mic and try again.",
-      "other": "Voice input stopped unexpectedly. Try again or type your question."
+    "composerPlaceholder": "Type a message…",
+    "composerInactive": "Start the assistant to type or talk",
+    "transcriptEmptySubtitle": "Tap the voice button below and say something like “I want to add a tenant”.",
+    "searchResultsTitle": "{count, plural, =0 {No matching records} one {# matching record} other {# matching records}}",
+    "noResults": "No records matched.",
+    "openList": "Open the full list",
+    "saved": "\"{name}\" saved.",
+    "status": {
+      "idle": "Ready when you are",
+      "connecting": "Connecting…",
+      "listening": "Listening…",
+      "speaking": "Speaking…",
+      "thinking": "Working on it…"
     },
-    "voiceReplyOn": "Spoken replies on (click to turn off)",
-    "voiceReplyOff": "Spoken replies off (click to turn on)",
-    "stopSpeaking": "Stop speaking",
-    "clear": "Clear conversation",
-    "thinking": "Looking that up…",
-    "notSent": "Not answered",
-    "emptyTitle": "How can I help?",
-    "emptyDescription": "Type or tap the mic and speak, in English, Urdu or Roman Urdu. I can read your data but not change it yet.",
+    "errors": {
+      "micDenied": "Microphone access was blocked. Allow it in your browser's site settings, then try again.",
+      "micMissing": "No microphone was found. Connect one, then try again.",
+      "connect": "Could not start the voice session. Please try again.",
+      "connection": "The connection to Gemini had a problem.",
+      "closed": "The voice session ended. Press Start talking to continue.",
+      "closedWithReason": "The voice session ended: {reason}"
+    },
+    "forms": {
+      "property": "New property",
+      "tenant": "New tenant",
+      "lease": "New lease",
+      "payment": "New payment"
+    },
+    "form": {
+      "progress": "{filled} of {total} required",
+      "askingNow": "Gemini is asking about this — speak, type or pick.",
+      "askAbout": "Ask about this",
+      "filled": "Filled — change",
+      "choose": "Choose…",
+      "allRequiredDone": "All required details are in. Add optional ones by voice, or review.",
+      "nestedFor": "Creating it for the {form} form",
+      "review": "Review",
+      "reviewSubtitle": "Check the details, then save — or just say “yes, save it”.",
+      "keepEditing": "Keep editing"
+    },
     "suggestions": {
-      "summary": "Give me a summary of this month",
-      "owing": "Is mahine kis kis ka kiraya baqi hai?",
-      "endingLeases": "Which leases end in the next three months?"
-    },
-    "transcribing": "Understanding what you said…",
-    "preparingVoice": "Preparing voice reply…",
-    "playReply": "Play this reply aloud"
+      "property": "I want to add a property",
+      "tenant": "Add a new tenant",
+      "lease": "Create a lease",
+      "payment": "Record a rent payment",
+      "search": "Find active leases"
+    }
   }
 }

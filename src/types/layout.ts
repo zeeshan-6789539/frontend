@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { TUserRole } from "@/types/user";
+import type { IUser, TUserRole } from "@/types/user";
 
 export interface IAppNavProps {
   onNavigate?: () => void;
@@ -14,6 +14,12 @@ export interface IPageHeadingProps {
 
 export interface IRequireRoleProps {
   roles: readonly TUserRole[];
+  // Extra per-user check on top of roles, e.g. a company feature flag
+  isAllowed?: (user: IUser) => boolean;
   children: ReactNode;
   fallback?: ReactNode;
+}
+
+export interface IAssistantOnlyProps {
+  children: ReactNode;
 }

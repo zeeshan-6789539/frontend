@@ -44,7 +44,7 @@ const LoginPage = async ({ params }: PageProps<"/[locale]/login">) => {
           <h1 className="text-brand-gradient w-fit text-2xl font-semibold tracking-tight">
             {t("title")}
           </h1>
-          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+          <p className="text-sm text-muted-foreground">{t("subtitle", { appName: siteConfig.name })}</p>
         </div>
 
         <LoginForm />

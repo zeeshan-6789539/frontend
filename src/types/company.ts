@@ -7,6 +7,7 @@ export interface ICompany {
   city: string | null;
   status: boolean;
   invoiceMailSend: boolean;
+  voiceAssistantEnabled: boolean;
   hasMailPassword: boolean;
   createdAt: string;
   updatedAt: string;
@@ -33,6 +34,7 @@ export interface ICompanyPayload {
   city?: string;
   status: boolean;
   invoiceMailSend: boolean;
+  voiceAssistantEnabled: boolean;
   mailPassword?: string;
 }
 
@@ -49,5 +51,6 @@ export interface ICompanyFormValues {
   city: string;
   status: boolean;
   invoiceMailSend: boolean;
+  voiceAssistantEnabled: boolean;
   mailPassword: string;
 }

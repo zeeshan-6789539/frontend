@@ -7,6 +7,7 @@ export interface IUser {
   companyId: string | null;
   // Only populated on the authenticated profile response
   companyName?: string | null;
+  voiceAssistantEnabled?: boolean;
   email: string;
   name: string;
   phone: string | null;

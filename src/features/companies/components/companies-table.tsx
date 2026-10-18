@@ -33,6 +33,7 @@ export const CompaniesTable = ({
           <TableHeaderCell>{t("fields.location")}</TableHeaderCell>
           <TableHeaderCell>{t("fields.propertyCount")}</TableHeaderCell>
           <TableHeaderCell>{t("fields.tenantCount")}</TableHeaderCell>
+          <TableHeaderCell>{t("fields.voiceAssistant")}</TableHeaderCell>
           <TableHeaderCell>{t("fields.status")}</TableHeaderCell>
           <TableHeaderCell>{t("fields.createdAt")}</TableHeaderCell>
           <TableHeaderCell className="text-end">{tCommon("actions")}</TableHeaderCell>
@@ -63,6 +64,12 @@ export const CompaniesTable = ({
 
             <TableCell className="text-muted-foreground">
               <p>{company.tenantCount}</p>
+            </TableCell>
+
+            <TableCell>
+              <Badge variant={company.voiceAssistantEnabled ? "success" : "muted"}>
+                {company.voiceAssistantEnabled ? tCommon("yes") : tCommon("no")}
+              </Badge>
             </TableCell>
 
             <TableCell>

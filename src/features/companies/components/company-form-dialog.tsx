@@ -29,6 +29,7 @@ const toFormValues = (company: ICompany | null): ICompanyFormValues => ({
   city: company?.city ?? "",
   status: company?.status ?? true,
   invoiceMailSend: company?.invoiceMailSend ?? false,
+  voiceAssistantEnabled: company?.voiceAssistantEnabled ?? false,
   // Never returned by the API, so the field always starts blank
   mailPassword: "",
 });
@@ -41,6 +42,7 @@ const toPayload = (values: ICompanyFormValues) => ({
   city: emptyToUndefined(values.city),
   status: values.status,
   invoiceMailSend: values.invoiceMailSend,
+  voiceAssistantEnabled: values.voiceAssistantEnabled,
   // Blank means "keep the current one" — dropped before sending
   mailPassword: emptyToUndefined(values.mailPassword),
 });
@@ -71,7 +73,7 @@ export const CompanyFormDialog = ({
     { value: "false", label: tCommon("deactivated") },
   ];
 
-  const invoiceMailSendOptions = [
+  const yesNoOptions = [
     { value: "true", label: tCommon("yes") },
     { value: "false", label: tCommon("no") },
   ];
@@ -222,7 +224,17 @@ export const CompanyFormDialog = ({
               id="invoiceMailSend"
               value={String(values.invoiceMailSend)}
               onChange={(value) => setValue("invoiceMailSend", value === "true")}
-              options={invoiceMailSendOptions}
+              options={yesNoOptions}
+              disabled={isPending}
+            />
+          </FormField>
+
+          <FormField id="voiceAssistantEnabled" label={t("fields.voiceAssistant")}>
+            <Select
+              id="voiceAssistantEnabled"
+              value={String(values.voiceAssistantEnabled)}
+              onChange={(value) => setValue("voiceAssistantEnabled", value === "true")}
+              options={yesNoOptions}
               disabled={isPending}
             />
           </FormField>
