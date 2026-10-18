@@ -77,7 +77,7 @@
   },
   "auth": {
     "title": "سائن ان",
-    "subtitle": "جاری رکھنے کے لیے اپنا آر ایم ایس ای میل اور پاس ورڈ درج کریں۔",
+    "subtitle": "جاری رکھنے کے لیے اپنا {appName} ای میل اور پاس ورڈ درج کریں۔",
     "email": "ای میل",
     "emailPlaceholder": "superadmin@mifa.mifa",
     "password": "پاس ورڈ",

@@ -33,7 +33,7 @@ const toFormValues = (user: IUser | null): IUserFormValues => ({
   name: user?.name ?? "",
   phone: user?.phone ?? "",
   companyId: user?.companyId ?? "",
-  role: user?.role ?? "staff",
+  role: user?.role ?? "client_admin",
   status: user?.status ?? true,
 });
 
