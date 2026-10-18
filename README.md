@@ -40,7 +40,7 @@ values are inlined at build time, so restart `pnpm dev` or rebuild after changin
 | ------------------------------- | ------------------------------- | ------------------------------------------- |
 | `NEXT_PUBLIC_API_BASE_URL`      | `http://localhost:5000/api/v1`  | Backend host + prefix + version             |
 | `NEXT_PUBLIC_COMPANY_NAME`      | `Restaurant Management System`  | Full company name, used as the site description |
-| `NEXT_PUBLIC_COMPANY_SHOT_NAME` | `RMS`                           | Short company name, used as the site name   |
+| `NEXT_PUBLIC_COMPANY_SHOT_NAME` | `RMS`                           | Short company name, used as the site name and in the login subtitle |
 
 ### Scripts
 
